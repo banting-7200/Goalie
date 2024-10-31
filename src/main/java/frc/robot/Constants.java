@@ -47,4 +47,28 @@ public final class Constants {
     public static final double LEFT_X_DEADBAND = 0.01;
     public static final double LEFT_Y_DEADBAND = 0.01;
   }
+
+  public static final class xboxController {
+    public static final int lockSwerveButton = 4;
+    public static final int zeroSwerveButton = 1;
+    public static final int changeEyeLightPattern = 3; // Change to actual button ID, 3 is placeholder
+  }
+
+  public static final class copilotController {
+    // Constants for the buttons on the co-pliot button box
+    public static final int leftKickButton = 2;
+    public static final int leftHandButton = 3;
+
+    public static final int rightKickButton = 4;
+    public static final int rightHandButton = 5;
+
+    public static final int enableLimelightButton = 6;
+    public static final int enableAutoModeButton = 7;
+    public static final int extendHeadButton = 8;
+  }
+
+  public static final class aprilTagIDs {
+    public static final int goalAlignTag = 1;
+    
+  }
 }

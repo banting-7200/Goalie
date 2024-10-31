@@ -1,10 +1,12 @@
-package frc.robot.subsystems;
+package frc.robot.Vision;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.Feedback.ShuffleboardSubsystem;
 
 public class LimelightDevice extends SubsystemBase {
+  ShuffleboardSubsystem shuffle = ShuffleboardSubsystem.getInstance();
   private NetworkTable mainTable;
   public int mode;
   private static LimelightDevice instance = null;
@@ -96,5 +98,44 @@ public class LimelightDevice extends SubsystemBase {
     }
 
     return ty;
+  }
+
+  public void shuffleSetUp() {
+    shuffle.setTab("Limelight Data");
+
+    shuffle.addCamera("Limelight Stream", "Limelight", "10.72.0.11:5800");
+
+    shuffle.setLayout("Limelight Config");
+    shuffle.setBoolean("LEDs On", false);
+    shuffle.setNumber("Pipeline", -1);
+
+    shuffle.setLayout("Tag", 2, 4);
+    shuffle.setBoolean("Tag Detected", false);
+    shuffle.setNumber("Tag ID", -1);
+    shuffle.setNumber("Tag X", -1);
+    shuffle.setNumber("Tag Y", -1);
+    shuffle.setNumber("Tag Area", -1);
+    shuffle.setLayout(null);
+  }
+
+  public void shuffleUpdate() {
+    double ledMode = mainTable.getEntry("ledMode").getDouble(0);
+    double pipeline = mainTable.getEntry("pipeline").getDouble(0);
+    double ttarget = mainTable.getEntry("tv").getDouble(0);
+    double tid = mainTable.getEntry("tid").getDouble(-1);
+    double tx = mainTable.getEntry("tx").getDouble(0);
+    double ty = mainTable.getEntry("ty").getDouble(0);
+    double ta = mainTable.getEntry("ta").getDouble(0);
+
+    boolean ledOn = ledMode == 3 ? true : false;
+    boolean tdetected = ttarget == 0 ? false : true;
+
+    shuffle.setBoolean("LEDs On", ledOn);
+    shuffle.setNumber("Pipeline", pipeline);
+    shuffle.setBoolean("Tag Detected", tdetected);
+    shuffle.setNumber("Tag ID", tid);
+    shuffle.setNumber("Tag X", tx);
+    shuffle.setNumber("Tag Y", ty);
+    shuffle.setNumber("Tag Area", ta);
   }
 }
