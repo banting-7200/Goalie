@@ -17,23 +17,37 @@ public class alignCommand extends Command {
 
   @Override
   public void execute() {
-    swerve.drive(new Translation2d(getYtranslation(), 0 /*getXtranslation()*/), 0, false);
+    if (camera.hasTarget()) {
+      swerve.drive(new Translation2d(getYtranslation(), getXtranslation()), getRotation(), false);
+    } else {
+      swerve.drive(new Translation2d(0, 0), getRotation(), false);
+    }
   }
 
   private double getXtranslation() {
     if (camera.getTagYaw() < -1) {
-      return 0.1;
-    } else if (camera.getTagYaw() > 1) {
       return -0.1;
+    } else if (camera.getTagYaw() > 1) {
+      return 0.1;
     }
     return 0;
   }
 
   private double getYtranslation() {
     if (camera.getTagPitch() < -11) {
-      return 0.1;
-    } else if (camera.getTagPitch() > -9) {
       return -0.1;
+    } else if (camera.getTagPitch() > -9) {
+
+      return 0.1;
+    }
+    return 0;
+  }
+
+  private double getRotation() {
+    if (swerve.getHeading().getDegrees() > 1) {
+      return -0.1;
+    } else if (swerve.getHeading().getDegrees() < -1) {
+      return 0.1;
     }
     return 0;
   }

@@ -47,7 +47,7 @@ public class AprilTagCam extends SubsystemBase {
   }
 
   public boolean hasTarget() {
-    return table.getEntry("targetArea").getBoolean(false);
+    return table.getEntry("hasTarget").getBoolean(false);
   }
 
   public void updateShuffle() {
