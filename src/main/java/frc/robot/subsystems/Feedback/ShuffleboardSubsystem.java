@@ -31,10 +31,7 @@ public class ShuffleboardSubsystem {
   SendableChooser<String> autos;
   SimpleWidget lights;
 
-  private ShuffleboardSubsystem() {
-    setTab("Driver");
-    lights = tab.add("Lights", true).withWidget(BuiltInWidgets.kBooleanBox);
-  }
+  private ShuffleboardSubsystem() {}
 
   // Singleton instance of the shuffleboard class
   public static synchronized ShuffleboardSubsystem getInstance() {
@@ -223,7 +220,7 @@ public class ShuffleboardSubsystem {
   }
 
   public void addCamera(String name, String camera, String url) {
-    tab.addCamera(name, camera, url).withSize(2, 2); // doesnt add any functionalaty again
+    tab.addCamera(name, camera, url).withSize(3, 2); // doesnt add any functionalaty again
   }
 
   public void setText(String name, String text) { // puts text to the dashboard

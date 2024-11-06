@@ -19,6 +19,7 @@ import frc.robot.commands.swervedrive.drivebase.AbsoluteDrive;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteFieldDrive;
 import frc.robot.commands.swervedrive.drivebase.TeleopDrive;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.swervedrive.alignCommand;
 import java.io.File;
 import java.util.function.BooleanSupplier;
 
@@ -112,6 +113,7 @@ public class RobotContainer {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
 
     new JoystickButton(driverXbox, 1).onTrue((new InstantCommand(drivebase::zeroGyro)));
+    new JoystickButton(driverXbox, 2).whileTrue(new alignCommand(drivebase));
     new JoystickButton(driverXbox, 3).onTrue(new InstantCommand(drivebase::addFakeVisionReading));
     // new JoystickButton(driverXbox, 3).whileTrue(new RepeatCommand(new
     // InstantCommand(drivebase::lock, drivebase)));

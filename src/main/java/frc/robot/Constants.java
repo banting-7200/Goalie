@@ -51,7 +51,8 @@ public final class Constants {
   public static final class xboxController {
     public static final int lockSwerveButton = 4;
     public static final int zeroSwerveButton = 1;
-    public static final int changeEyeLightPattern = 3; // Change to actual button ID, 3 is placeholder
+    public static final int changeEyeLightPattern =
+        3; // Change to actual button ID, 3 is placeholder
   }
 
   public static final class copilotController {
@@ -69,6 +70,5 @@ public final class Constants {
 
   public static final class aprilTagIDs {
     public static final int goalAlignTag = 1;
-    
   }
 }

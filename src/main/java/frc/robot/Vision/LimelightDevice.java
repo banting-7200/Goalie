@@ -33,9 +33,8 @@ public class LimelightDevice extends SubsystemBase {
   }
 
   public boolean getLight() {
-    double light;
-    light = (double) mainTable.getEntry("lightMode").getNumber(3);
-    return light == 1 ? false : true;
+    double light = (double) mainTable.getEntry("lightMode").getNumber(3);
+    return light != 1;
   }
 
   public void setMode(int selection) { // sets pipeline
@@ -43,19 +42,18 @@ public class LimelightDevice extends SubsystemBase {
   }
 
   public boolean tagDetected() { // returns true if tag is detected
-    double ttarget = 0;
+    double ttarget;
     try {
       ttarget = mainTable.getEntry("tv").getDouble(0);
     } catch (NullPointerException e) {
       System.out.println("ttarget ERROR, EXCEPTION: " + e);
       ttarget = 0;
     }
-    boolean tdetected = ttarget == 0 ? false : true;
-    return tdetected;
+    return ttarget != 0;
   }
 
   public int getTagID() { // returns id of apriltag or -1 if no tag is detected.
-    int tid = 0;
+    int tid;
     try {
       tid = (int) mainTable.getEntry("tid").getDouble(-1);
     } catch (NullPointerException e) {
@@ -66,7 +64,7 @@ public class LimelightDevice extends SubsystemBase {
   }
 
   public double getTagArea() { // return tag area
-    double ta = 0;
+    double ta;
     try {
       ta = mainTable.getEntry("ta").getDouble(0);
 
@@ -78,7 +76,7 @@ public class LimelightDevice extends SubsystemBase {
   }
 
   public double getTagX() { // return tag x value (horizontal across camera screen)
-    double tx = 0;
+    double tx;
     try {
       tx = mainTable.getEntry("tx").getDouble(0);
     } catch (NullPointerException e) {
@@ -89,7 +87,7 @@ public class LimelightDevice extends SubsystemBase {
   }
 
   public double getTagY() { // return tag y value (vertical across camera screen)
-    double ty = 0;
+    double ty;
     try {
       ty = mainTable.getEntry("ty").getDouble(0);
     } catch (NullPointerException e) {

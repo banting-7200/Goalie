@@ -9,8 +9,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Vision.AprilTagCam;
 import frc.robot.Vision.LimelightDevice;
-
 import java.io.File;
 import java.io.IOException;
 import swervelib.parser.SwerveParser;
@@ -28,6 +28,7 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
   private LimelightDevice limelight = LimelightDevice.getInstance();
+  private AprilTagCam camera = AprilTagCam.getInstance();
   private Timer disabledTimer;
 
   public Robot() {
@@ -37,7 +38,6 @@ public class Robot extends TimedRobot {
   public static Robot getInstance() {
     return instance;
   }
-
 
   @Override
   public void robotInit() {
@@ -51,10 +51,10 @@ public class Robot extends TimedRobot {
     disabledTimer = new Timer();
   }
 
-
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    camera.updateShuffle();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

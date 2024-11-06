@@ -55,14 +55,4 @@ public class NetworkTables {
       driveFrontLeftEncoder, driveFrontRightEncoder, driveBackLeftEncoder, driveBackRightEncoder
     };
   }
-
-  public void setSwerveShuffleboard() {
-    double[] driveData = returnDriveData();
-    double[] angleData = returnEncoderData();
-    shuffle.setTab("Swerve");
-    shuffle.setSwerve("Front Left Module", driveData[0], angleData[0]);
-    shuffle.setSwerve("Front Right Module", driveData[1], angleData[1]);
-    shuffle.setSwerve("Back Left Module", driveData[2], angleData[2]);
-    shuffle.setSwerve("Back Right Module", driveData[3], angleData[3]);
-  }
 }
