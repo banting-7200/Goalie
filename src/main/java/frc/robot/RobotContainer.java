@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
@@ -38,6 +39,8 @@ public class RobotContainer {
   // Replace with CommandPS4Controller or CommandJoystick if needed
   CommandJoystick driverController = new CommandJoystick(1);
 
+  private DigitalInput creepSwitch;
+
   // CommandJoystick driverController = new
   // CommandJoystick(3);//(OperatorConstants.DRIVER_CONTROLLER_PORT);
   static XboxController driverXbox = new XboxController(0);
@@ -46,6 +49,8 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
+
+    creepSwitch = new DigitalInput(4);
 
     AbsoluteDrive closedAbsoluteDrive =
         new AbsoluteDrive(
@@ -83,10 +88,16 @@ public class RobotContainer {
 
     Trigger t = new Trigger(creepBoolean);
     t.onTrue(new InstantCommand(() -> drivebase.setCreep(true))) // Set creep on
-        .onFalse(new InstantCommand(() -> drivebase.setCreep(false))); // Set creep off
+        .onFalse(
+            new InstantCommand(() -> drivebase.setCreep(false))
+                .andThen(new InstantCommand(() -> pollCreepSwitch()))); // Set creep off
 
     drivebase.setDefaultCommand(
         !RobotBase.isSimulation() ? closedAbsoluteDrive : closedFieldAbsoluteDrive);
+  }
+
+  void pollCreepSwitch() {
+    drivebase.setCreep(creepSwitch.get());
   }
 
   /*
