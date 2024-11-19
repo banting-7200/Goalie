@@ -27,7 +27,7 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
-  private LimelightDevice limelight = LimelightDevice.getInstance();
+  private LimelightDevice limelight = m_robotContainer.getLimelightDevice();
   private AprilTagCam camera = AprilTagCam.getInstance();
   private Timer disabledTimer;
 
