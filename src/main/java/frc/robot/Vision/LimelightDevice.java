@@ -14,18 +14,12 @@ public class LimelightDevice extends SubsystemBase {
   public int speakerSideTag;
   public int ampTag;
 
-  public LimelightDevice() {
+  public LimelightDevice(String networkTablesKey) {
     mainTable =
-        NetworkTableInstance.getDefault().getTable("limelight"); // gets the network table with key
+        NetworkTableInstance.getDefault()
+            .getTable(networkTablesKey); // gets the network table with key
 
     mode = 0;
-  }
-
-  public static synchronized LimelightDevice getInstance() {
-    if (instance == null) {
-      instance = new LimelightDevice();
-    }
-    return instance;
   }
 
   public void setLight(boolean on) { // toggles lights (true for on, false for off)
