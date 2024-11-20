@@ -4,11 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
-import swervelib.math.Matter;
-import swervelib.parser.PIDFConfig;
-
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -19,57 +14,21 @@ import swervelib.parser.PIDFConfig;
  */
 public final class Constants {
 
-  public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
-  public static final Matter CHASSIS =
-      new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
-  public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
-
-  public static final class Auton {
-
-    public static final PIDFConfig xAutoPID = new PIDFConfig(0.7, 0, 0);
-    public static final PIDFConfig yAutoPID = new PIDFConfig(0.7, 0, 0);
-    public static final PIDFConfig angleAutoPID = new PIDFConfig(0.4, 0, 0.01);
-
-    public static final double MAX_SPEED = 4;
-    public static final double MAX_ACCELERATION = 2;
+  public final class Controller {
+    public static final int port = 0;
   }
 
-  public static final class Drivebase {
+  public final class Legs {
+    public class PID {
+      public static final double P = 0.01;
+      public static final double I = 0;
+      public static final double D = 0;
+    }
 
-    // Hold time on motor brakes when disabled
-    public static final double WHEEL_LOCK_TIME = 10; // seconds
-    public static final double creepSpeedMultiplier = 0.2;
-    public static final double maxAngularVelocity = 5.5;
-  }
-
-  public static class OperatorConstants {
-
-    // Joystick Deadband
-    public static final double LEFT_X_DEADBAND = 0.01;
-    public static final double LEFT_Y_DEADBAND = 0.01;
-  }
-
-  public static final class xboxController {
-    public static final int lockSwerveButton = 4;
-    public static final int zeroSwerveButton = 1;
-    public static final int changeEyeLightPattern =
-        3; // Change to actual button ID, 3 is placeholder
-  }
-
-  public static final class copilotController {
-    // Constants for the buttons on the co-pliot button box
-    public static final int leftKickButton = 2;
-    public static final int leftHandButton = 3;
-
-    public static final int rightKickButton = 4;
-    public static final int rightHandButton = 5;
-
-    public static final int enableLimelightButton = 6;
-    public static final int enableAutoModeButton = 7;
-    public static final int extendHeadButton = 8;
-  }
-
-  public static final class aprilTagIDs {
-    public static final int goalAlignTag = 1;
+    public class Positions {
+      public static final double upPosition = 100;
+      public static final double downPosition = 0;
+      public static final double stopRange = 0.5;
+    }
   }
 }
