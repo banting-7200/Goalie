@@ -5,14 +5,28 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Constants.*;
+import frc.robot.Subsystems.LegSubsystem;
 
 public class RobotContainer {
 
-  static XboxController driverXbox = new XboxController(Constants.Controller.port);
+  static XboxController controller = new XboxController(Constants.Controller.port);
+  private LegSubsystem leftLeg;
 
-  public RobotContainer() {}
+  public RobotContainer() {
+    leftLeg = new LegSubsystem(DeviceIDs.leftLegMotor);
+    configureBindings();
+  }
 
   private void configureBindings() {
-    // new JoystickButton(driverXbox, 1).onTrue();
+    // new JoystickButton(controller, Controller.Buttons.toggleLegs).debounce(3);
+    new JoystickButton(controller, Controller.Buttons.toggleLegs)
+        // .debounce(3)
+        // .onTrue(new InstantCommand(() -> System.out.println("Clicked")));
+        // .debounce(3);
+        .onTrue(new InstantCommand(() -> leftLeg.togglePosition()));
+    // .onTrue(new InstantCommand(() -> System.out.println("Debounced")));
   }
 }

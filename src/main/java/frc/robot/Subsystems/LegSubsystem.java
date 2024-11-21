@@ -20,6 +20,7 @@ public class LegSubsystem extends SubsystemBase {
 
   public LegSubsystem(int deviceID) {
     motor = new CANSparkMax(deviceID, MotorType.kBrushless);
+    encoder = motor.getAbsoluteEncoder();
 
     PIDController = motor.getPIDController();
     PIDController.setP(Legs.PID.P, PIDSlot);
@@ -31,7 +32,7 @@ public class LegSubsystem extends SubsystemBase {
   }
 
   public void togglePosition() {
-    setPosition(getEncoderPosition() < upPosition - stopRange);
+    setPosition(getEncoderPosition() > upPosition + stopRange);
   }
 
   public void setPosition(boolean up) {
