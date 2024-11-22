@@ -24,13 +24,13 @@ public final class Constants {
 
   public final class Legs {
     public class PID {
-      public static final double P = 1.10;
+      public static final double P = 1.553;
       public static final double I = 0;
-      public static final double D = 0.05;
+      public static final double D = 0.503;
     }
 
     public class Positions {
-      public static final double upPosition = 0.250;
+      public static final double upPosition = 0.230;
       public static final double downPosition = 0.342;
       public static final double stopRange = 0.05;
     }
