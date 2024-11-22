@@ -30,7 +30,7 @@ public final class Constants {
     }
 
     public class Positions {
-      public static final double upPosition = 0.250;
+      public static final double upPosition = 0.230;
       public static final double downPosition = 0.342;
       public static final double stopRange = 0.05;
     }

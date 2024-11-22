@@ -32,10 +32,11 @@ public class LegSubsystem extends SubsystemBase {
   }
 
   public void togglePosition() {
-    setPosition(getEncoderPosition() > upPosition + stopRange);
+    setPosition((getEncoderPosition() > upPosition + stopRange));
   }
 
   public void setPosition(boolean up) {
+    System.out.println(up + " " + getEncoderPosition() + " " + upPosition);
     if (up) {
       setMotorPosition(upPosition);
     } else {
@@ -45,7 +46,9 @@ public class LegSubsystem extends SubsystemBase {
 
   private void setMotorPosition(double setpoint) {
     double currentPosition = encoder.getPosition();
-    while (currentPosition < setpoint + stopRange && currentPosition > setpoint - stopRange) {
+
+    while (currentPosition < setpoint - stopRange || currentPosition > setpoint + stopRange) {
+      System.out.println("worked " + currentPosition);
       PIDController.setReference(setpoint, CANSparkMax.ControlType.kPosition, PIDSlot);
       currentPosition = encoder.getPosition();
     }
