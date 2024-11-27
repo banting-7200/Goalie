@@ -13,8 +13,11 @@ public class LegSubsystem extends SubsystemBase {
   private SparkPIDController PIDController;
 
   private double stopRange = Legs.Positions.stopRange;
-  private double upPosition = Legs.Positions.upPosition;
-  private double downPosition = Legs.Positions.downPosition;
+  private double upPositionEncoderValue = Legs.Positions.upPosition;
+  private double downPositionEncoderValue = Legs.Positions.downPosition;
+  private double currentPosition;
+  private double setPoint;
+  private boolean legPositionToggle = true;
 
   private int PIDSlot = 0;
 
@@ -23,39 +26,68 @@ public class LegSubsystem extends SubsystemBase {
     encoder = motor.getAbsoluteEncoder();
 
     PIDController = motor.getPIDController();
-    PIDController.setP(Legs.PID.P, PIDSlot);
-    PIDController.setI(Legs.PID.I, PIDSlot);
-    PIDController.setD(Legs.PID.D, PIDSlot);
-    PIDController.setPositionPIDWrappingEnabled(false);
+    PIDController.setP(Legs.PID.P);
+    PIDController.setI(Legs.PID.I);
+    PIDController.setD(Legs.PID.D);
+    PIDController.setFF(
+        0); // 0 is default, only used in velocity control type, in which, its different for each
+    // motor
+    PIDController.setIZone(1.5, PIDSlot); // if I goes past this, stop using I
     PIDController.setOutputRange(-1, 1);
     PIDController.setFeedbackDevice(encoder);
   }
 
   public void togglePosition() {
-    setPosition((getEncoderPosition() > upPosition + stopRange));
-  }
-
-  public void setPosition(boolean up) {
-    System.out.println(up + " " + getEncoderPosition() + " " + upPosition);
-    if (up) {
-      setMotorPosition(upPosition);
+    currentPosition = getEncoderPosition();
+    legPositionToggle = !legPositionToggle;
+    if (legPositionToggle) {
+      setPositionSetPoint(upPositionEncoderValue);
     } else {
-      setMotorPosition(downPosition);
+      setPositionSetPoint(downPositionEncoderValue);
     }
+    moveMotorToPosition();
   }
 
-  private void setMotorPosition(double setpoint) {
-    double currentPosition = encoder.getPosition();
+  private boolean checkErrorRange() {
+    currentPosition = getEncoderPosition();
+    return Math.abs(currentPosition - setPoint) < stopRange;
+  }
 
-    while (currentPosition < setpoint - stopRange || currentPosition > setpoint + stopRange) {
-      System.out.println("worked " + currentPosition);
-      PIDController.setReference(setpoint, CANSparkMax.ControlType.kPosition, PIDSlot);
+  public void setPositionSetPoint(double setPoint) {
+    this.setPoint = setPoint;
+  }
+
+  public double getCurrentSetPoint() {
+    return setPoint;
+  }
+
+  private void moveMotorToPosition() {
+    currentPosition = encoder.getPosition();
+
+    while (!checkErrorRange() && !checkSoftLimits()) {
+      System.out.println("Trying to turn");
+      PIDController.setReference(setPoint, CANSparkMax.ControlType.kPosition, PIDSlot);
       currentPosition = encoder.getPosition();
     }
   }
 
-  private void setMotorSpeed(double speed) {
-    motor.set(speed);
+  private boolean checkSoftLimits() {
+    if (currentPosition > upPositionEncoderValue
+        || currentPosition
+            < downPositionEncoderValue) { // soft limits, wont move if not inside up and down
+      // positions
+      System.out.println(
+          "SOFT LIMITS "
+              + downPositionEncoderValue
+              + " || "
+              + currentPosition
+              + " || "
+              + upPositionEncoderValue);
+      return true;
+    } else {
+
+      return false;
+    }
   }
 
   private double getEncoderPosition() {
