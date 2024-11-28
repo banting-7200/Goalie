@@ -7,7 +7,7 @@ import com.revrobotics.SparkPIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Legs;
 
-public class LegSubsystem extends SubsystemBase {
+public class LegSubsystemSmartMotion extends SubsystemBase {
   private CANSparkMax motor;
   private AbsoluteEncoder encoder;
   private SparkPIDController PIDController;
@@ -21,7 +21,7 @@ public class LegSubsystem extends SubsystemBase {
 
   private int PIDSlot = 0;
 
-  public LegSubsystem(int deviceID) {
+  public LegSubsystemSmartMotion(int deviceID) {
     motor = new CANSparkMax(deviceID, MotorType.kBrushless);
     encoder = motor.getAbsoluteEncoder();
 
@@ -35,6 +35,10 @@ public class LegSubsystem extends SubsystemBase {
     PIDController.setIZone(1.5, PIDSlot); // if I goes past this, stop using I
     PIDController.setOutputRange(-1, 1);
     PIDController.setFeedbackDevice(encoder);
+    PIDController.setSmartMotionMinOutputVelocity(Legs.motorSpeeds.fastMinVel, PIDSlot);
+    PIDController.setSmartMotionMaxVelocity(Legs.motorSpeeds.fastMaxVel, PIDSlot);
+    PIDController.setSmartMotionMaxAccel(Legs.motorSpeeds.motorAccel, PIDSlot);
+    PIDController.setSmartMotionAllowedClosedLoopError(Legs.motorSpeeds.allowedError, PIDSlot);
   }
 
   public void togglePosition() {

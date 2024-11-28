@@ -15,19 +15,26 @@ public class RobotContainer {
 
   static XboxController controller = new XboxController(Constants.Controller.port);
   private LegSubsystem leftLeg;
+  private LegSubsystem rightLeg;
   private EventLoop loop = new EventLoop();
 
   public RobotContainer() {
     leftLeg = new LegSubsystem(DeviceIDs.leftLegMotor);
+    rightLeg = new LegSubsystem(DeviceIDs.rightLegMotor);
     configureBindings();
   }
 
   private void configureBindings() {
 
     BooleanEvent toggleLeftLeg =
-        new BooleanEvent(loop, () -> controller.getAButton()).debounce(3, DebounceType.kFalling);
+        new BooleanEvent(loop, () -> controller.getXButton()).debounce(3, DebounceType.kFalling);
 
     toggleLeftLeg.rising().ifHigh(() -> leftLeg.togglePosition());
+
+    BooleanEvent toggleRightLeg =
+        new BooleanEvent(loop, () -> controller.getBButton()).debounce(3, DebounceType.kFalling);
+
+    toggleRightLeg.rising().ifHigh(() -> rightLeg.togglePosition());
 
     // new JoystickButton(controller, Controller.Buttons.toggleLegs).debounce(3);
     // new JoystickButton(controller, Controller.Buttons.toggleLegs)

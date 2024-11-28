@@ -24,20 +24,31 @@ public final class Constants {
 
   public final class Legs {
     public class PID {
-      public static final double P = 0.5;
+      public static final double P = 0.009;
       public static final double I = 0;
-      public static final double D = 0.503;
+      public static final double D = 0.2;
     }
 
     public class Positions {
-      public static final double upPosition = 0.215;
-      public static final double downPosition = 0.05;
-      public static final double stopRange = 0.05;
+      public static final double upPosition = 0.19;
+      public static final double downPosition = 0;
+      public static final double stopRange = 0.02;
+    }
+
+    public class motorSpeeds {
+      public static final double maxRPM = 5700;
+      public static final double motorAccel = 0.1;
+      public static final double allowedError = 0.009;
+      public static double fastMaxVel = 0.1;
+      public static double fastMinVel = 0.1;
+      public static double slowMaxVel = 0.1;
+      public static double slowMinVel = 0.1;
+      public static double targetRPM = 2000;
     }
   }
 
   public final class DeviceIDs {
     public static final int leftLegMotor = 1;
-    public static final int rightLegMotor = 0;
+    public static final int rightLegMotor = 2;
   }
 }
