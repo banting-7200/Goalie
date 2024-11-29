@@ -5,8 +5,6 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import java.util.ArrayList;
@@ -19,8 +17,6 @@ public class ShuffleboardSubsystem {
   ShuffleboardTab tab;
   List<String> entryNames = new ArrayList<String>();
   List<GenericEntry> entries = new ArrayList<GenericEntry>();
-  SendableChooser<String> autos;
-  SimpleWidget lights;
 
   private ShuffleboardSubsystem() {
     setTab("PID");
@@ -151,18 +147,6 @@ public class ShuffleboardSubsystem {
     }
   }
 
-  public void setSwerve(
-      String name,
-      double speed,
-      double direction) { // create a named list layout of swerve motor and
-    // direction values.
-    setLayout(name, 2, 2);
-    setNumber(
-        name + " Speed", speed, BuiltInWidgets.kDial); // todo:see if max and mins needs to be set.
-    setNumber(name + " Direction", direction, BuiltInWidgets.kGyro); // same here
-    setLayout(null);
-  }
-
   public void setPID(String name, double p, double i, double d) { // create a named list layout of
     // PID values.
     setTab("PID");
@@ -186,20 +170,6 @@ public class ShuffleboardSubsystem {
       String name,
       Command command) { // creates button which automatically runs the command it was set with.
     tab.add(name, command);
-  }
-
-  public void newAutoChooser(
-      SendableChooser<String>
-          inAutos) { // creates drop down containing autos, doesn't add any functionality to the
-    // basic function, just contains everything in the subsystem
-    setTab("Pre-Match");
-    autos = inAutos;
-    tab.add("Autos", autos).withSize(2, 1);
-    autos.setDefaultOption("No Auto Selected", "(MIDDLE) Basic Auto");
-  }
-
-  public String getAuto() { // returns auto from drop down;
-    return (autos.getSelected());
   }
 
   public void addCamera(String name, String camera, String url) {

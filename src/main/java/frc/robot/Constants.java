@@ -24,9 +24,9 @@ public final class Constants {
 
   public final class Legs {
     public class PID {
-      public static final double P = 0.007;
-      public static final double I = 0.003;
-      public static final double D = 0.002;
+      public static double P = 0.007;
+      public static double I = 0.003;
+      public static double D = 0.002;
     }
 
     public class Positions {

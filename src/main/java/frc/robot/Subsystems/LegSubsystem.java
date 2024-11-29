@@ -11,7 +11,7 @@ public class LegSubsystem extends SubsystemBase {
   private CANSparkMax motor;
   private AbsoluteEncoder encoder;
   private SparkPIDController PIDController;
-  private static ShuffleboardSubsystem shuffle;
+  private static ShuffleboardSubsystem shuffle = ShuffleboardSubsystem.getInstance();
 
   private double stopRange = Legs.Positions.stopRange;
   private double upPositionEncoderValue = Legs.Positions.upPosition;
@@ -39,12 +39,13 @@ public class LegSubsystem extends SubsystemBase {
     PIDController.setOutputRange(-1, 1);
     PIDController.setFeedbackDevice(encoder);
 
+    this.deviceID = deviceID;
     shuffle.setPID(
         "Motor: " + deviceID, PIDController.getP(), PIDController.getI(), PIDController.getD());
   }
 
   public void togglePosition() {
-    System.out.println(currentPosition);
+    // System.out.println(currentPosition);
     legPositionUp = !legPositionUp;
     if (legPositionUp) {
       setPositionSetPoint(upPositionEncoderValue - 5);
@@ -70,7 +71,7 @@ public class LegSubsystem extends SubsystemBase {
   public void run() {
     currentPosition = encoder.getPosition();
     if (withinSoftLimits() && this.holdPosition) {
-      System.out.println("Trying to turn || " + currentPosition + " setpoint: " + setPoint);
+      // System.out.println("Trying to turn || " + currentPosition + " setpoint: " + setPoint);
       PIDController.setReference(setPoint, CANSparkMax.ControlType.kPosition, PIDSlot);
     }
   }
@@ -81,13 +82,13 @@ public class LegSubsystem extends SubsystemBase {
             < (downPositionEncoderValue
                 - stopRange)) { // soft limits, wont move if not inside up and down
       // positions
-      System.out.println(
-          "SOFT LIMITS "
-              + downPositionEncoderValue
-              + " || "
-              + currentPosition
-              + " || "
-              + upPositionEncoderValue);
+      // System.out.println(
+      // "SOFT LIMITS "
+      //     + downPositionEncoderValue
+      //     + " || "
+      //     + currentPosition
+      //     + " || "
+      //  + upPositionEncoderValue);
       return false;
     } else {
 

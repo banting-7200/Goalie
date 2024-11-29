@@ -44,6 +44,16 @@ public class RobotContainer {
               // leftLeg.toggleHoldPosition();
             });
 
+    BooleanEvent updatePIDs = new BooleanEvent(loop, () -> controller.getAButton());
+
+    updatePIDs
+        .rising()
+        .ifHigh(
+            () -> {
+              rightLeg.updateShuffe();
+              leftLeg.updateShuffe();
+              System.out.println("UPDATING PIDS");
+            });
     // new JoystickButton(controller, Controller.Buttons.toggleLegs).debounce(3);
     // new JoystickButton(controller, Controller.Buttons.toggleLegs)
     // .debounce(3)

@@ -51,8 +51,6 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
     m_robotContainer.pollLoop();
-    m_robotContainer.leftLeg.updateShuffe();
-    m_robotContainer.rightLeg.updateShuffe();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
