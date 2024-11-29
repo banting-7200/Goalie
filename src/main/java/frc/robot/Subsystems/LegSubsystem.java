@@ -17,7 +17,8 @@ public class LegSubsystem extends SubsystemBase {
   private double downPositionEncoderValue = Legs.Positions.downPosition;
   private double currentPosition;
   private double setPoint;
-  private boolean legPositionToggle = true;
+  private boolean legPositionUp = true;
+  private boolean holdPosition = false;
 
   private int PIDSlot = 0;
 
@@ -38,21 +39,19 @@ public class LegSubsystem extends SubsystemBase {
   }
 
   public void togglePosition() {
-    currentPosition = getEncoderPosition();
     System.out.println(currentPosition);
-    legPositionToggle = !legPositionToggle;
-    // if (legPositionToggle) {
-    //   setPositionSetPoint(upPositionEncoderValue);
-    // } else {
-    //   setPositionSetPoint(downPositionEncoderValue);
-    // }
-    setPositionSetPoint(1);
-    moveMotorToPosition();
+    legPositionUp = !legPositionUp;
+    if (legPositionUp) {
+      setPositionSetPoint(upPositionEncoderValue - 5);
+    } else {
+      setPositionSetPoint(downPositionEncoderValue + 5);
+    }
+    // setPositionSetPoint(90);
+
   }
 
-  private boolean checkErrorRange() {
-    currentPosition = getEncoderPosition();
-    return Math.abs(currentPosition - setPoint) < stopRange;
+  public void toggleHoldPosition() {
+    this.holdPosition = !this.holdPosition;
   }
 
   public void setPositionSetPoint(double setPoint) {
@@ -63,19 +62,15 @@ public class LegSubsystem extends SubsystemBase {
     return setPoint;
   }
 
-  private void moveMotorToPosition() {
+  public void run() {
     currentPosition = encoder.getPosition();
-    System.out.println(
-        "trying to move, limits stopped movement " + Math.abs(currentPosition - setPoint));
-
-    while (!checkSoftLimits()) {
-      System.out.println("Trying to turn");
+    if (withinSoftLimits() && this.holdPosition) {
+      System.out.println("Trying to turn || " + currentPosition + " setpoint: " + setPoint);
       PIDController.setReference(setPoint, CANSparkMax.ControlType.kPosition, PIDSlot);
-      currentPosition = encoder.getPosition();
     }
   }
 
-  private boolean checkSoftLimits() {
+  private boolean withinSoftLimits() {
     if (currentPosition > (upPositionEncoderValue + stopRange)
         || currentPosition
             < (downPositionEncoderValue
@@ -88,10 +83,10 @@ public class LegSubsystem extends SubsystemBase {
               + currentPosition
               + " || "
               + upPositionEncoderValue);
-      return true;
+      return false;
     } else {
 
-      return false;
+      return true;
     }
   }
 

@@ -24,15 +24,15 @@ public final class Constants {
 
   public final class Legs {
     public class PID {
-      public static final double P = 0.009;
-      public static final double I = 0;
-      public static final double D = 0.2;
+      public static final double P = 0.007;
+      public static final double I = 0.003;
+      public static final double D = 0.002;
     }
 
     public class Positions {
-      public static final double upPosition = 0.19;
-      public static final double downPosition = 0;
-      public static final double stopRange = 0.02;
+      public static final double upPosition = 113; // 240
+      public static final double downPosition = 41; // 174
+      public static final double stopRange = 3;
     }
 
     public class motorSpeeds {

@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
@@ -26,15 +25,24 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-    BooleanEvent toggleLeftLeg =
-        new BooleanEvent(loop, () -> controller.getXButton()).debounce(3, DebounceType.kFalling);
+    // BooleanEvent toggleLeftLeg =
+    //     new BooleanEvent(loop, () -> controller.getXButton()).debounce(3, DebounceType.kFalling);
 
-    toggleLeftLeg.rising().ifHigh(() -> leftLeg.togglePosition());
+    // toggleLeftLeg.rising().ifHigh(() -> leftLeg.togglePosition());
 
-    BooleanEvent toggleRightLeg =
-        new BooleanEvent(loop, () -> controller.getBButton()).debounce(3, DebounceType.kFalling);
+    BooleanEvent toggleRightLeg = new BooleanEvent(loop, () -> controller.getBButton());
 
     toggleRightLeg.rising().ifHigh(() -> rightLeg.togglePosition());
+
+    BooleanEvent toggleSafeMode = new BooleanEvent(loop, () -> controller.getYButton());
+
+    toggleSafeMode
+        .rising()
+        .ifHigh(
+            () -> {
+              rightLeg.toggleHoldPosition();
+              // leftLeg.toggleHoldPosition();
+            });
 
     // new JoystickButton(controller, Controller.Buttons.toggleLegs).debounce(3);
     // new JoystickButton(controller, Controller.Buttons.toggleLegs)
@@ -47,5 +55,7 @@ public class RobotContainer {
 
   public void pollLoop() {
     loop.poll();
+    leftLeg.run();
+    rightLeg.run();
   }
 }
