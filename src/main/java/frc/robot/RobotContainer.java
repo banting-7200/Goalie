@@ -51,7 +51,7 @@ public class RobotContainer {
         .ifHigh(
             () -> {
               rightLeg.updateShuffe();
-              leftLeg.updateShuffe();
+              // leftLeg.updateShuffe();
               System.out.println("UPDATING PIDS");
             });
     // new JoystickButton(controller, Controller.Buttons.toggleLegs).debounce(3);
@@ -65,7 +65,7 @@ public class RobotContainer {
 
   public void pollLoop() {
     loop.poll();
-    leftLeg.run();
+    // leftLeg.run();
     rightLeg.run();
   }
 }

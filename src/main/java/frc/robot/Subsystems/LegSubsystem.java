@@ -38,19 +38,22 @@ public class LegSubsystem extends SubsystemBase {
     PIDController.setIZone(1.5, PIDSlot); // if I goes past this, stop using I
     PIDController.setOutputRange(-1, 1);
     PIDController.setFeedbackDevice(encoder);
+    PIDController.setPositionPIDWrappingEnabled(false);
 
     this.deviceID = deviceID;
     shuffle.setPID(
         "Motor: " + deviceID, PIDController.getP(), PIDController.getI(), PIDController.getD());
+    shuffle.setBoolean("Up", legPositionUp);
+    shuffle.setBoolean("Hold", holdPosition);
   }
 
   public void togglePosition() {
     // System.out.println(currentPosition);
     legPositionUp = !legPositionUp;
     if (legPositionUp) {
-      setPositionSetPoint(upPositionEncoderValue - 5);
+      setPositionSetPoint(upPositionEncoderValue - stopRange);
     } else {
-      setPositionSetPoint(downPositionEncoderValue + 5);
+      setPositionSetPoint(downPositionEncoderValue + stopRange);
     }
     // setPositionSetPoint(90);
 
@@ -58,6 +61,10 @@ public class LegSubsystem extends SubsystemBase {
 
   public void toggleHoldPosition() {
     this.holdPosition = !this.holdPosition;
+  }
+
+  public void setHoldPosition(boolean holdPosition) {
+    this.holdPosition = holdPosition;
   }
 
   public void setPositionSetPoint(double setPoint) {
@@ -73,7 +80,11 @@ public class LegSubsystem extends SubsystemBase {
     if (withinSoftLimits() && this.holdPosition) {
       // System.out.println("Trying to turn || " + currentPosition + " setpoint: " + setPoint);
       PIDController.setReference(setPoint, CANSparkMax.ControlType.kPosition, PIDSlot);
+    } else {
+      motor.set(0);
     }
+    shuffle.setBoolean("Up", legPositionUp);
+    shuffle.setBoolean("Hold", holdPosition);
   }
 
   private boolean withinSoftLimits() {
@@ -82,13 +93,13 @@ public class LegSubsystem extends SubsystemBase {
             < (downPositionEncoderValue
                 - stopRange)) { // soft limits, wont move if not inside up and down
       // positions
-      // System.out.println(
-      // "SOFT LIMITS "
-      //     + downPositionEncoderValue
-      //     + " || "
-      //     + currentPosition
-      //     + " || "
-      //  + upPositionEncoderValue);
+      System.out.println(
+          "SOFT LIMITS "
+              + downPositionEncoderValue
+              + " || "
+              + currentPosition
+              + " || "
+              + upPositionEncoderValue);
       return false;
     } else {
 
