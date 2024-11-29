@@ -13,8 +13,8 @@ import frc.robot.Subsystems.LegSubsystem;
 public class RobotContainer {
 
   static XboxController controller = new XboxController(Constants.Controller.port);
-  private LegSubsystem leftLeg;
-  private LegSubsystem rightLeg;
+  public LegSubsystem leftLeg;
+  public LegSubsystem rightLeg;
   private EventLoop loop = new EventLoop();
 
   public RobotContainer() {

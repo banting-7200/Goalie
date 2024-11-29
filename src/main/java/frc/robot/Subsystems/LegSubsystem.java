@@ -11,6 +11,7 @@ public class LegSubsystem extends SubsystemBase {
   private CANSparkMax motor;
   private AbsoluteEncoder encoder;
   private SparkPIDController PIDController;
+  private static ShuffleboardSubsystem shuffle;
 
   private double stopRange = Legs.Positions.stopRange;
   private double upPositionEncoderValue = Legs.Positions.upPosition;
@@ -19,6 +20,7 @@ public class LegSubsystem extends SubsystemBase {
   private double setPoint;
   private boolean legPositionUp = true;
   private boolean holdPosition = false;
+  private int deviceID;
 
   private int PIDSlot = 0;
 
@@ -36,6 +38,9 @@ public class LegSubsystem extends SubsystemBase {
     PIDController.setIZone(1.5, PIDSlot); // if I goes past this, stop using I
     PIDController.setOutputRange(-1, 1);
     PIDController.setFeedbackDevice(encoder);
+
+    shuffle.setPID(
+        "Motor: " + deviceID, PIDController.getP(), PIDController.getI(), PIDController.getD());
   }
 
   public void togglePosition() {
@@ -92,5 +97,12 @@ public class LegSubsystem extends SubsystemBase {
 
   private double getEncoderPosition() {
     return encoder.getPosition();
+  }
+
+  public void updateShuffe() {
+    double[] PID = shuffle.getPID("Motor: " + deviceID);
+    PIDController.setP(PID[0]);
+    PIDController.setI(PID[1]);
+    PIDController.setD(PID[2]);
   }
 }
