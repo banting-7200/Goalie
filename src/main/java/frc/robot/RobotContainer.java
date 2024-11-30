@@ -18,17 +18,26 @@ public class RobotContainer {
   private EventLoop loop = new EventLoop();
 
   public RobotContainer() {
-    leftLeg = new LegSubsystem(DeviceIDs.leftLegMotor);
-    rightLeg = new LegSubsystem(DeviceIDs.rightLegMotor);
+    leftLeg =
+        new LegSubsystem(
+            "Left Leg",
+            DeviceIDs.leftLegMotor,
+            Legs.Positions.leftDownPosition,
+            Legs.Positions.leftUpPosition);
+    rightLeg =
+        new LegSubsystem(
+            "Right Leg",
+            DeviceIDs.rightLegMotor,
+            Legs.Positions.rightDownPosition,
+            Legs.Positions.rightUpPosition);
     configureBindings();
   }
 
   private void configureBindings() {
 
-    // BooleanEvent toggleLeftLeg =
-    //     new BooleanEvent(loop, () -> controller.getXButton()).debounce(3, DebounceType.kFalling);
+    BooleanEvent toggleLeftLeg = new BooleanEvent(loop, () -> controller.getXButton());
 
-    // toggleLeftLeg.rising().ifHigh(() -> leftLeg.togglePosition());
+    toggleLeftLeg.rising().ifHigh(() -> leftLeg.togglePosition());
 
     BooleanEvent toggleRightLeg = new BooleanEvent(loop, () -> controller.getBButton());
 
@@ -41,7 +50,7 @@ public class RobotContainer {
         .ifHigh(
             () -> {
               rightLeg.toggleHoldPosition();
-              // leftLeg.toggleHoldPosition();
+              leftLeg.toggleHoldPosition();
             });
 
     BooleanEvent updatePIDs = new BooleanEvent(loop, () -> controller.getAButton());
@@ -51,7 +60,7 @@ public class RobotContainer {
         .ifHigh(
             () -> {
               rightLeg.updateShuffe();
-              // leftLeg.updateShuffe();
+              leftLeg.updateShuffe();
               System.out.println("UPDATING PIDS");
             });
     // new JoystickButton(controller, Controller.Buttons.toggleLegs).debounce(3);
@@ -65,7 +74,7 @@ public class RobotContainer {
 
   public void pollLoop() {
     loop.poll();
-    // leftLeg.run();
+    leftLeg.run();
     rightLeg.run();
   }
 }

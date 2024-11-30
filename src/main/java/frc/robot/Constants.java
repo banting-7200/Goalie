@@ -30,20 +30,14 @@ public final class Constants {
     }
 
     public class Positions {
-      public static final double upPosition = 122; // 240
-      public static final double downPosition = 50; // 174
-      public static final double stopRange = 3;
-    }
+      public static final double leftUpPosition = 239.5;
+      public static final double leftDownPosition = 176;
 
-    public class motorSpeeds {
-      public static final double maxRPM = 5700;
-      public static final double motorAccel = 0.1;
-      public static final double allowedError = 0.009;
-      public static double fastMaxVel = 0.1;
-      public static double fastMinVel = 0.1;
-      public static double slowMaxVel = 0.1;
-      public static double slowMinVel = 0.1;
-      public static double targetRPM = 2000;
+      public static final double rightUpPosition = 130;
+      public static final double rightDownPosition = 52;
+
+      public static final double upperStopRange = 1;
+      public static final double lowerStopRange = 5;
     }
   }
 

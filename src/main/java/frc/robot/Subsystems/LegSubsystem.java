@@ -13,18 +13,28 @@ public class LegSubsystem extends SubsystemBase {
   private SparkPIDController PIDController;
   private static ShuffleboardSubsystem shuffle = ShuffleboardSubsystem.getInstance();
 
-  private double stopRange = Legs.Positions.stopRange;
-  private double upPositionEncoderValue = Legs.Positions.upPosition;
-  private double downPositionEncoderValue = Legs.Positions.downPosition;
+  private double upperStopRange = Legs.Positions.upperStopRange;
+  private double lowerStopRange = Legs.Positions.lowerStopRange;
+
+  private double upPositionEncoderValue;
+  private double downPositionEncoderValue;
   private double currentPosition;
   private double setPoint;
+
   private boolean legPositionUp = true;
   private boolean holdPosition = false;
   private int deviceID;
 
+  private String name;
+
   private int PIDSlot = 0;
 
-  public LegSubsystem(int deviceID) {
+  public LegSubsystem(
+      String name, int deviceID, double downPositionEncoderValue, double upPositionEncoderValue) {
+
+    this.downPositionEncoderValue = downPositionEncoderValue;
+    this.upPositionEncoderValue = upPositionEncoderValue;
+    setPoint = upPositionEncoderValue;
     motor = new CANSparkMax(deviceID, MotorType.kBrushless);
     encoder = motor.getAbsoluteEncoder();
 
@@ -41,19 +51,19 @@ public class LegSubsystem extends SubsystemBase {
     PIDController.setPositionPIDWrappingEnabled(false);
 
     this.deviceID = deviceID;
-    shuffle.setPID(
-        "Motor: " + deviceID, PIDController.getP(), PIDController.getI(), PIDController.getD());
-    shuffle.setBoolean("Up", legPositionUp);
-    shuffle.setBoolean("Hold", holdPosition);
+    this.name = name;
+
+    shuffle.setPID(name, PIDController.getP(), PIDController.getI(), PIDController.getD());
+    shuffle.setBoolean(name + " Up", legPositionUp);
+    shuffle.setBoolean(name + " Hold", holdPosition);
   }
 
   public void togglePosition() {
-    // System.out.println(currentPosition);
     legPositionUp = !legPositionUp;
     if (legPositionUp) {
-      setPositionSetPoint(upPositionEncoderValue - stopRange);
+      setPositionSetPoint(upPositionEncoderValue);
     } else {
-      setPositionSetPoint(downPositionEncoderValue + stopRange);
+      setPositionSetPoint(downPositionEncoderValue);
     }
     // setPositionSetPoint(90);
 
@@ -77,42 +87,82 @@ public class LegSubsystem extends SubsystemBase {
 
   public void run() {
     currentPosition = encoder.getPosition();
-    if (withinSoftLimits() && this.holdPosition) {
-      // System.out.println("Trying to turn || " + currentPosition + " setpoint: " + setPoint);
-      PIDController.setReference(setPoint, CANSparkMax.ControlType.kPosition, PIDSlot);
+    if (legPositionUp && holdPosition) {
+      if (withinUpperSoftLimits()) {
+        PIDController.setReference(setPoint, CANSparkMax.ControlType.kPosition, PIDSlot);
+      } else {
+        motor.set(0);
+        System.out.println("upper soft");
+      }
+    } else if (!legPositionUp && holdPosition) {
+      if (withinLowerSoftLimits()) {
+        PIDController.setReference(setPoint, CANSparkMax.ControlType.kPosition, PIDSlot);
+      } else {
+        motor.set(0);
+        System.out.println("lower soft");
+      }
     } else {
       motor.set(0);
     }
-    shuffle.setBoolean("Up", legPositionUp);
-    shuffle.setBoolean("Hold", holdPosition);
+
+    // if (withinSoftLimits() && this.holdPosition) {
+    //   // System.out.println("Trying to turn || " + currentPosition + " setpoint: " + setPoint);
+    //   PIDController.setReference(setPoint, CANSparkMax.ControlType.kPosition, PIDSlot);
+    // } else {
+    //   motor.set(0);
+    // }
+    shuffle.setBoolean(name + " Up", legPositionUp);
+    shuffle.setBoolean(name + " Hold", holdPosition);
   }
 
-  private boolean withinSoftLimits() {
-    if (currentPosition > (upPositionEncoderValue + stopRange)
-        || currentPosition
-            < (downPositionEncoderValue
-                - stopRange)) { // soft limits, wont move if not inside up and down
-      // positions
-      System.out.println(
-          "SOFT LIMITS "
-              + downPositionEncoderValue
-              + " || "
-              + currentPosition
-              + " || "
-              + upPositionEncoderValue);
-      return false;
-    } else {
-
-      return true;
-    }
+  private boolean withinLowerSoftLimits() {
+    System.out.println(
+        "LOWER SOFT LIMITS "
+            + downPositionEncoderValue
+            + " || "
+            + currentPosition
+            + " || "
+            + upPositionEncoderValue);
+    return (currentPosition > downPositionEncoderValue + lowerStopRange);
   }
+
+  private boolean withinUpperSoftLimits() {
+    System.out.println(
+        "UPPER SOFT LIMITS "
+            + downPositionEncoderValue
+            + " || "
+            + currentPosition
+            + " || "
+            + upPositionEncoderValue);
+    return (currentPosition < upPositionEncoderValue - upperStopRange);
+  }
+
+  // private boolean withinSoftLimits() {
+  //   if (currentPosition > (upPositionEncoderValue + stopRange)
+  //       || currentPosition
+  //           < (downPositionEncoderValue
+  //               - stopRange)) { // soft limits, wont move if not inside up and down
+  //     // positions
+  //     System.out.println(
+  //         "SOFT LIMITS "
+  //             + downPositionEncoderValue
+  //             + " || "
+  //             + currentPosition
+  //             + " || "
+  //             + upPositionEncoderValue);
+  //     return false;
+  //   } else {
+
+  //     return true;
+  //   }
+  // }
 
   private double getEncoderPosition() {
     return encoder.getPosition();
   }
 
   public void updateShuffe() {
-    double[] PID = shuffle.getPID("Motor: " + deviceID);
+    double[] PID = shuffle.getPID(name);
     PIDController.setP(PID[0]);
     PIDController.setI(PID[1]);
     PIDController.setD(PID[2]);
