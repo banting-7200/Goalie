@@ -17,9 +17,6 @@ public final class Constants {
   public final class Controller {
     public static final int port = 0;
 
-    public final class Buttons {
-      public static final int toggleLegs = 1;
-    }
   }
 
   public final class Legs {
@@ -39,10 +36,39 @@ public final class Constants {
       public static final double upperStopRange = 1;
       public static final double lowerStopRange = 5;
     }
+
+    public final class motorControllerConfigurations {
+      public static final int currentLimit = 40;
+    }
+  }
+  
+  public final class Arms {
+
+    public class PID {
+      public static double P = 0;
+      public static double I = 0;
+      public static double D = 0;
+    }
+
+    public class Positions {
+      public static final double leftUpPosition = 0;
+      public static final double leftDownPosition = 0;
+
+      public static final double rightUpPosition = 0;
+      public static final double rightDownPosition = 0;
+
+      public static final double stopRange = 2;
+    }
+
+    public final class motorControllerConfigurations {
+      public static final int currentLimit = 40;
+    }
   }
 
   public final class DeviceIDs {
     public static final int leftLegMotor = 1;
     public static final int rightLegMotor = 2;
   }
+
+  
 }

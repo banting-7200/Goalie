@@ -4,10 +4,13 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.IdleMode;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Legs;
 
 public class LegSubsystem extends SubsystemBase {
+
   private CANSparkMax motor;
   private AbsoluteEncoder encoder;
   private SparkPIDController PIDController;
@@ -20,13 +23,11 @@ public class LegSubsystem extends SubsystemBase {
   private double downPositionEncoderValue;
   private double currentPosition;
   private double setPoint;
+  private int deviceID;
+  private String name;
 
   private boolean legPositionUp = true;
   private boolean holdPosition = false;
-  private int deviceID;
-
-  private String name;
-
   private int PIDSlot = 0;
 
   public LegSubsystem(
@@ -34,7 +35,10 @@ public class LegSubsystem extends SubsystemBase {
 
     this.downPositionEncoderValue = downPositionEncoderValue;
     this.upPositionEncoderValue = upPositionEncoderValue;
+    this.deviceID = deviceID;
+    this.name = name;
     setPoint = upPositionEncoderValue;
+
     motor = new CANSparkMax(deviceID, MotorType.kBrushless);
     encoder = motor.getAbsoluteEncoder();
 
@@ -42,20 +46,22 @@ public class LegSubsystem extends SubsystemBase {
     PIDController.setP(Legs.PID.P);
     PIDController.setI(Legs.PID.I);
     PIDController.setD(Legs.PID.D);
-    PIDController.setFF(
-        0); // 0 is default, only used in velocity control type, in which, its different for each
-    // motor
-    PIDController.setIZone(1.5, PIDSlot); // if I goes past this, stop using I
+    PIDController.setFF(0); 
+    PIDController.setIZone(1.5, PIDSlot); 
     PIDController.setOutputRange(-1, 1);
     PIDController.setFeedbackDevice(encoder);
     PIDController.setPositionPIDWrappingEnabled(false);
 
-    this.deviceID = deviceID;
-    this.name = name;
-
+    //motor.restoreFactoryDefaults();
+    motor.setSmartCurrentLimit(Legs.motorControllerConfigurations.currentLimit);
+    motor.setIdleMode(IdleMode.kBrake);
+    if (name == "right") {motor.setInverted(true);}
+    motor.burnFlash();
+    
     shuffle.setPID(name, PIDController.getP(), PIDController.getI(), PIDController.getD());
     shuffle.setBoolean(name + " Up", legPositionUp);
     shuffle.setBoolean(name + " Hold", holdPosition);
+
   }
 
   public void togglePosition() {
@@ -136,26 +142,6 @@ public class LegSubsystem extends SubsystemBase {
             + upPositionEncoderValue);
     return (currentPosition < upPositionEncoderValue - upperStopRange);
   }
-
-  // private boolean withinSoftLimits() {
-  //   if (currentPosition > (upPositionEncoderValue + stopRange)
-  //       || currentPosition
-  //           < (downPositionEncoderValue
-  //               - stopRange)) { // soft limits, wont move if not inside up and down
-  //     // positions
-  //     System.out.println(
-  //         "SOFT LIMITS "
-  //             + downPositionEncoderValue
-  //             + " || "
-  //             + currentPosition
-  //             + " || "
-  //             + upPositionEncoderValue);
-  //     return false;
-  //   } else {
-
-  //     return true;
-  //   }
-  // }
 
   private double getEncoderPosition() {
     return encoder.getPosition();
