@@ -14,7 +14,6 @@ public class LegSubsystem extends SubsystemBase {
   private CANSparkMax motor;
   private AbsoluteEncoder encoder;
   private SparkPIDController PIDController;
-  private static ShuffleboardSubsystem shuffle = ShuffleboardSubsystem.getInstance();
 
   private double upperStopRange = Legs.Positions.upperStopRange;
   private double lowerStopRange = Legs.Positions.lowerStopRange;
@@ -23,20 +22,16 @@ public class LegSubsystem extends SubsystemBase {
   private double downPositionEncoderValue;
   private double currentPosition;
   private double setPoint;
-  private int deviceID;
-  private String name;
 
   private boolean legPositionUp = true;
   private boolean holdPosition = false;
   private int PIDSlot = 0;
 
   public LegSubsystem(
-      String name, int deviceID, double downPositionEncoderValue, double upPositionEncoderValue) {
+      int deviceID, double downPositionEncoderValue, double upPositionEncoderValue, boolean isInverted) {
 
     this.downPositionEncoderValue = downPositionEncoderValue;
     this.upPositionEncoderValue = upPositionEncoderValue;
-    this.deviceID = deviceID;
-    this.name = name;
     setPoint = upPositionEncoderValue;
 
     motor = new CANSparkMax(deviceID, MotorType.kBrushless);
@@ -55,13 +50,8 @@ public class LegSubsystem extends SubsystemBase {
     //motor.restoreFactoryDefaults();
     motor.setSmartCurrentLimit(Legs.motorControllerConfigurations.currentLimit);
     motor.setIdleMode(IdleMode.kBrake);
-    if (name == "right") {motor.setInverted(true);}
+    motor.setInverted(isInverted);
     motor.burnFlash();
-    
-    shuffle.setPID(name, PIDController.getP(), PIDController.getI(), PIDController.getD());
-    shuffle.setBoolean(name + " Up", legPositionUp);
-    shuffle.setBoolean(name + " Hold", holdPosition);
-
   }
 
   public void togglePosition() {
@@ -117,8 +107,6 @@ public class LegSubsystem extends SubsystemBase {
     // } else {
     //   motor.set(0);
     // }
-    shuffle.setBoolean(name + " Up", legPositionUp);
-    shuffle.setBoolean(name + " Hold", holdPosition);
   }
 
   private boolean withinLowerSoftLimits() {
@@ -147,8 +135,15 @@ public class LegSubsystem extends SubsystemBase {
     return encoder.getPosition();
   }
 
-  public void updateShuffe() {
-    double[] PID = shuffle.getPID(name);
+  public boolean isUp() {
+    return legPositionUp;
+  }
+
+  public boolean isLocked() {
+    return holdPosition;
+  }
+
+  public void setPID(double[] PID) {
     PIDController.setP(PID[0]);
     PIDController.setI(PID[1]);
     PIDController.setD(PID[2]);
