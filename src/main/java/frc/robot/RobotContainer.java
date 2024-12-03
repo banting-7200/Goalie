@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import frc.robot.Constants.*;
+import frc.robot.Subsystems.ArmSubsystem;
 import frc.robot.Subsystems.LegSubsystem;
 import frc.robot.Subsystems.ShuffleboardSubsystem;
 
@@ -18,23 +19,37 @@ public class RobotContainer {
   // Physical Components //
   public LegSubsystem leftLeg;
   public LegSubsystem rightLeg;
+  public ArmSubsystem leftArm;
+  public ArmSubsystem rightArm;
 
   private EventLoop loop = new EventLoop();
   private ShuffleboardSubsystem shuffle = ShuffleboardSubsystem.getInstance();
 
   public RobotContainer() {
-    leftLeg =
-        new LegSubsystem(
-            DeviceIDs.leftLegMotor,
-            Legs.Positions.leftDownPosition,
-            Legs.Positions.leftUpPosition,
-            false);
-    rightLeg =
-        new LegSubsystem(
-            DeviceIDs.rightLegMotor,
+    leftLeg = new LegSubsystem(
+        DeviceIDs.leftLegMotor,
+        Legs.Positions.leftDownPosition,
+        Legs.Positions.leftUpPosition,
+        false);
+            
+    rightLeg = new LegSubsystem(
+          DeviceIDs.rightLegMotor,
             Legs.Positions.rightDownPosition,
             Legs.Positions.rightUpPosition,
             true);
+
+    leftArm = new ArmSubsystem(
+        DeviceIDs.leftArmMotor,
+        Arms.Positions.leftMinPosition,
+        Arms.Positions.leftMaxPosition,
+        false);
+
+        
+    leftArm = new ArmSubsystem(
+        DeviceIDs.leftArmMotor,
+        Arms.Positions.leftMinPosition,
+        Arms.Positions.leftMaxPosition,
+        false);
     configureBindings();
   }
 

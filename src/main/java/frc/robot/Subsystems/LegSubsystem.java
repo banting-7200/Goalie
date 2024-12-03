@@ -100,13 +100,6 @@ public class LegSubsystem extends SubsystemBase {
     } else {
       motor.set(0);
     }
-
-    // if (withinSoftLimits() && this.holdPosition) {
-    //   // System.out.println("Trying to turn || " + currentPosition + " setpoint: " + setPoint);
-    //   PIDController.setReference(setPoint, CANSparkMax.ControlType.kPosition, PIDSlot);
-    // } else {
-    //   motor.set(0);
-    // }
   }
 
   private boolean withinLowerSoftLimits() {
@@ -129,10 +122,6 @@ public class LegSubsystem extends SubsystemBase {
             + " || "
             + upPositionEncoderValue);
     return (currentPosition < upPositionEncoderValue - upperStopRange);
-  }
-
-  private double getEncoderPosition() {
-    return encoder.getPosition();
   }
 
   public boolean isUp() {

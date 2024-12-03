@@ -27,7 +27,7 @@ public final class Constants {
     }
 
     public class Positions {
-      public static final double leftUpPosition = 239.5;
+      public static final double leftUpPosition = 240;
       public static final double leftDownPosition = 176;
 
       public static final double rightUpPosition = 130;
@@ -51,11 +51,11 @@ public final class Constants {
     }
 
     public class Positions {
-      public static final double leftUpPosition = 0;
-      public static final double leftDownPosition = 0;
+      public static final double leftMaxPosition = 217;
+      public static final double leftMinPosition = 171;
 
-      public static final double rightUpPosition = 0;
-      public static final double rightDownPosition = 0;
+      public static final double rightMaxPosition = 292;
+      public static final double rightMinPosition = 232;
 
       public static final double stopRange = 2;
     }
@@ -68,6 +68,8 @@ public final class Constants {
   public final class DeviceIDs {
     public static final int leftLegMotor = 1;
     public static final int rightLegMotor = 2;
+    public static final int leftArmMotor = 4;
+    public static final int rightArmMotor = 3;
   }
 
   

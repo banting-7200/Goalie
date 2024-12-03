@@ -13,7 +13,6 @@ public class ArmSubsystem extends SubsystemBase {
   private AbsoluteEncoder encoder;
   private SparkPIDController PIDController;
   private double armAngle;
-  private String armName;
   private double upPositionEncoderValue;
   private double downPositionEncoderValue;
   private double currentPosition;
@@ -21,20 +20,16 @@ public class ArmSubsystem extends SubsystemBase {
   private boolean holdPosition = false;
   private int PIDSlot = 0;
 
-  public ArmSubsystem(int deviceID, String armName, double upPositionEncoderValue, double downPositionEncoderValue) {
+  public ArmSubsystem(int deviceID, double upPositionEncoderValue, double downPositionEncoderValue, boolean isInverted) {
     this.upPositionEncoderValue = upPositionEncoderValue;
     this.downPositionEncoderValue = downPositionEncoderValue;
-    this.armAngle = armAngle;
-    this.armName = armName;
     setPoint = upPositionEncoderValue;
 
     motor = new CANSparkMax(deviceID, MotorType.kBrushless);
     PIDController = motor.getPIDController();
     encoder = motor.getAbsoluteEncoder();
     motor.setSmartCurrentLimit(Arms.motorControllerConfigurations.currentLimit);
-    if (armName == "right") {
-      motor.setInverted(true);
-    }
+    motor.setInverted(isInverted);
     motor.burnFlash();
 
     PIDController.setP(Arms.PID.P);
@@ -66,21 +61,31 @@ public class ArmSubsystem extends SubsystemBase {
     currentPosition = getEncoderPosition();
     if (currentPosition < upPositionEncoderValue + Arms.Positions.stopRange
         && currentPosition > downPositionEncoderValue - Arms.Positions.stopRange) {
-          System.out.println(currentPosition);
+      System.out.println(currentPosition);
       return true;
     }
-    System.out.println("SOFT LIMITS: " + (downPositionEncoderValue - Arms.Positions.stopRange) + " | " + currentPosition + " | " + upPositionEncoderValue + Arms.Positions.stopRange);
+    System.out.println("SOFT LIMITS: " + (downPositionEncoderValue - Arms.Positions.stopRange) + " | " + currentPosition
+        + " | " + upPositionEncoderValue + Arms.Positions.stopRange);
     return false;
+  }
+
+  public void moveFromRange(double position) {
+    if (position > 1) 
+      position = 1;
+    if (position < -1) 
+      position = -1;
+      
+    position = (position + 1) / 2 * (upPositionEncoderValue - downPositionEncoderValue) + downPositionEncoderValue;
+       
+    moveToAngle(position);
+    System.out.println(position);
   }
 
   public void moveToAngle(double armAngle) {
     this.armAngle = armAngle;
   }
 
-
   private double getEncoderPosition() {
     return encoder.getPosition();
   }
-
-
 }
