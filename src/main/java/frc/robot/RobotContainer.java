@@ -26,43 +26,51 @@ public class RobotContainer {
   private ShuffleboardSubsystem shuffle = ShuffleboardSubsystem.getInstance();
 
   public RobotContainer() {
-    leftLeg = new LegSubsystem(
-        DeviceIDs.leftLegMotor,
-        Legs.Positions.leftDownPosition,
-        Legs.Positions.leftUpPosition,
-        false);
-            
-    rightLeg = new LegSubsystem(
-          DeviceIDs.rightLegMotor,
+    shuffle.setTab("Status");
+    leftLeg =
+        new LegSubsystem(
+            DeviceIDs.leftLegMotor,
+            Legs.Positions.leftDownPosition,
+            Legs.Positions.leftUpPosition,
+            false);
+
+    rightLeg =
+        new LegSubsystem(
+            DeviceIDs.rightLegMotor,
             Legs.Positions.rightDownPosition,
             Legs.Positions.rightUpPosition,
             true);
 
-    leftArm = new ArmSubsystem(
-        DeviceIDs.leftArmMotor,
-        Arms.Positions.leftMinPosition,
-        Arms.Positions.leftMaxPosition,
-        false);
+    leftArm =
+        new ArmSubsystem(
+            DeviceIDs.leftArmMotor,
+            Arms.Positions.leftMinPosition,
+            Arms.Positions.leftMaxPosition,
+            false);
 
-        
-    leftArm = new ArmSubsystem(
-        DeviceIDs.leftArmMotor,
-        Arms.Positions.leftMinPosition,
-        Arms.Positions.leftMaxPosition,
-        false);
+    rightArm =
+        new ArmSubsystem(
+            DeviceIDs.rightArmMotor,
+            Arms.Positions.rightMaxPosition,
+            Arms.Positions.rightMinPosition,
+            true);
     configureBindings();
   }
 
   private void configureBindings() {
     shuffle.setPID("PID Tuner", 1, 0, 0);
 
-    BooleanEvent toggleLeftLeg = new BooleanEvent(loop, () -> controller.getXButton());
+    // BooleanEvent toggleLeftLeg = new BooleanEvent(loop, () -> controller.getXButton());
 
-    toggleLeftLeg.rising().ifHigh(() -> leftLeg.togglePosition());
+    // toggleLeftLeg.rising().ifHigh(() -> leftLeg.togglePosition());
 
-    BooleanEvent toggleRightLeg = new BooleanEvent(loop, () -> controller.getBButton());
+    // BooleanEvent toggleRightLeg = new BooleanEvent(loop, () -> controller.getBButton());
 
-    toggleRightLeg.rising().ifHigh(() -> rightLeg.togglePosition());
+    // toggleRightLeg.rising().ifHigh(() -> rightLeg.togglePosition());
+
+    BooleanEvent toggleRightArm = new BooleanEvent(loop, () -> controller.getBButton());
+
+    toggleRightArm.rising().ifHigh(() -> rightArm.togglePosition());
 
     BooleanEvent toggleSafeMode = new BooleanEvent(loop, () -> controller.getYButton());
 
@@ -70,8 +78,10 @@ public class RobotContainer {
         .rising()
         .ifHigh(
             () -> {
-              rightLeg.toggleHoldPosition();
-              leftLeg.toggleHoldPosition();
+              // rightLeg.toggleHoldPosition();
+              // leftLeg.toggleHoldPosition();
+              rightArm.toggleHoldPosition();
+              leftArm.toggleHoldPosition();
             });
 
     BooleanEvent updatePIDs = new BooleanEvent(loop, () -> controller.getAButton());
@@ -81,7 +91,7 @@ public class RobotContainer {
         .ifHigh(
             () -> {
               double[] PID = shuffle.getPID("PID Tuner");
-              //Simply change the below line to tune PIDs for another object.
+              // Simply change the below line to tune PIDs for another object.
               leftLeg.setPID(PID);
               System.out.println("UPDATING PIDS");
             });
@@ -89,8 +99,9 @@ public class RobotContainer {
 
   public void pollLoop() {
     loop.poll();
-    leftLeg.run();
-    rightLeg.run();
+    // leftLeg.run();
+    // rightLeg.run();
+    rightArm.run();
     updateShuffle();
   }
 
@@ -102,5 +113,8 @@ public class RobotContainer {
 
     shuffle.setBoolean("Right Leg Up", rightLeg.isUp());
     shuffle.setBoolean("Right Leg Locked", rightLeg.isLocked());
+
+    shuffle.setBoolean("Right Arm Up ", rightArm.isUp());
+    shuffle.setBoolean("Right Arm Locked", rightArm.isLocked());
   }
 }

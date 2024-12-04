@@ -58,6 +58,7 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
     m_robotContainer.leftLeg.setHoldPosition(false);
     m_robotContainer.rightLeg.setHoldPosition(false);
+    m_robotContainer.rightArm.setHoldPosition(false);
   }
 
   @Override
@@ -101,7 +102,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {
-    m_robotContainer.rightArm.moveFromRange(m_robotContainer.controller.getRightY());
+    // m_robotContainer.rightArm.moveFromRange(m_robotContainer.controller.getRightY());
   }
 
   /** This function is called once when the robot is first started up. */
@@ -110,6 +111,5 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically whilst in simulation. */
   @Override
-  public void simulationPeriodic() {
-  }
+  public void simulationPeriodic() {}
 }
