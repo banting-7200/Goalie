@@ -21,7 +21,7 @@ public class ArmSubsystem extends SubsystemBase {
   private double currentPosition;
   private double setPoint;
   private boolean holdPosition = false;
-
+  private boolean upPosition = false;
   private int PIDSlot = 0;
 
   public ArmSubsystem(
@@ -32,6 +32,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     this.upPositionEncoderValue = upPositionEncoderValue;
     this.downPositionEncoderValue = downPositionEncoderValue;
+    setPoint = downPositionEncoderValue;
     setPoint = downPositionEncoderValue;
 
     motor = new CANSparkMax(deviceID, MotorType.kBrushless);
@@ -58,6 +59,15 @@ public class ArmSubsystem extends SubsystemBase {
 
   public void setHoldPosition(boolean holdPosition) {
     this.holdPosition = holdPosition;
+  }
+
+  public void togglePosition() {
+    upPosition = !upPosition;
+    if (upPosition) {
+      this.setPoint = upPositionEncoderValue;
+    } else {
+      this.setPoint = downPositionEncoderValue;
+    }
   }
 
   public void run() {
@@ -93,6 +103,13 @@ public class ArmSubsystem extends SubsystemBase {
         (position + 1) / 2 * (upPositionEncoderValue - downPositionEncoderValue)
             + downPositionEncoderValue;
 
+    if (position > 1) position = 1;
+    if (position < -1) position = -1;
+
+    position =
+        (position + 1) / 2 * (upPositionEncoderValue - downPositionEncoderValue)
+            + downPositionEncoderValue;
+
     moveToAngle(position);
     System.out.println(position);
   }
@@ -105,13 +122,17 @@ public class ArmSubsystem extends SubsystemBase {
     return currentPosition;
   }
 
-  public boolean isLocked() {
-    return holdPosition;
-  }
-
   public void setPID(double[] PID) {
     PIDController.setP(PID[0]);
     PIDController.setI(PID[1]);
     PIDController.setD(PID[2]);
+  }
+
+  public boolean isUp() {
+    return upPosition;
+  }
+
+  public boolean isLocked() {
+    return holdPosition;
   }
 }
