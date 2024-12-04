@@ -16,14 +16,13 @@ public final class Constants {
 
   public final class Controller {
     public static final int port = 0;
-
   }
 
   public final class Legs {
     public class PID {
-      public static double P = 0.007;
-      public static double I = 0.003;
-      public static double D = 0.002;
+      public static final double P = 0.007;
+      public static final double I = 0.003;
+      public static final double D = 0.002;
     }
 
     public class Positions {
@@ -41,27 +40,27 @@ public final class Constants {
       public static final int currentLimit = 40;
     }
   }
-  
+
   public final class Arms {
 
     public class PID {
-      public static double P = 0;
-      public static double I = 0;
-      public static double D = 0;
+      public static final double P = 0.003;
+      public static final double I = 0;
+      public static final double D = 0.001;
     }
 
     public class Positions {
-      public static final double leftMaxPosition = 217;
-      public static final double leftMinPosition = 171;
+      public static final double leftMaxPosition = 210;
+      public static final double leftMinPosition = 180;
 
-      public static final double rightMaxPosition = 292;
-      public static final double rightMinPosition = 232;
+      public static final double rightMaxPosition = 300;
+      public static final double rightMinPosition = 240;
 
       public static final double stopRange = 2;
     }
 
     public final class motorControllerConfigurations {
-      public static final int currentLimit = 40;
+      public static final int currentLimit = 10;
     }
   }
 
@@ -71,6 +70,4 @@ public final class Constants {
     public static final int leftArmMotor = 4;
     public static final int rightArmMotor = 3;
   }
-
-  
 }

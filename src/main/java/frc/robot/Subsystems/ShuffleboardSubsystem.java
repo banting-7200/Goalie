@@ -7,11 +7,12 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ShuffleboardSubsystem {
+public class ShuffleboardSubsystem extends SubsystemBase {
   private static ShuffleboardSubsystem instance = null;
   ShuffleboardLayout layout;
   ShuffleboardTab tab;
@@ -36,10 +37,10 @@ public class ShuffleboardSubsystem {
 
   public void setLayout(
       String layoutName,
-      int x,
-      int y) { // sets which layout to put values to. Putting values of the same name in two
+      int width,
+      int height) { // sets which layout to put values to. Putting values of the same name in two
     // different layouts may mess with code.
-    layout = tab.getLayout(layoutName, "List Layout").withSize(x, y);
+    layout = tab.getLayout(layoutName, "List Layout").withSize(width, height);
   }
 
   public void setLayout(
@@ -228,7 +229,7 @@ public class ShuffleboardSubsystem {
 
       // lights.withProperties(Map.of("colorWhenTrue", colour.toHexString()));
     } catch (IllegalArgumentException e) {
-      System.out.println("Set Color Error, EXEPTION: " + e);
+      // System.out.println("Set Color Error, EXEPTION: " + e);
     }
   }
 }

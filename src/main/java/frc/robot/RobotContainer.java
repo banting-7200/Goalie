@@ -8,13 +8,11 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import frc.robot.Constants.*;
-import frc.robot.Subsystems.ArmSubsystem;
-import frc.robot.Subsystems.LegSubsystem;
-import frc.robot.Subsystems.ShuffleboardSubsystem;
+import frc.robot.Subsystems.*;
 
 public class RobotContainer {
 
-  static XboxController controller = new XboxController(Constants.Controller.port);
+  XboxController controller = new XboxController(Constants.Controller.port);
 
   // Physical Components //
   public LegSubsystem leftLeg;
@@ -26,30 +24,33 @@ public class RobotContainer {
   private ShuffleboardSubsystem shuffle = ShuffleboardSubsystem.getInstance();
 
   public RobotContainer() {
-    leftLeg = new LegSubsystem(
-        DeviceIDs.leftLegMotor,
-        Legs.Positions.leftDownPosition,
-        Legs.Positions.leftUpPosition,
-        false);
-            
-    rightLeg = new LegSubsystem(
-          DeviceIDs.rightLegMotor,
+    leftLeg =
+        new LegSubsystem(
+            DeviceIDs.leftLegMotor,
+            Legs.Positions.leftDownPosition,
+            Legs.Positions.leftUpPosition,
+            false);
+
+    rightLeg =
+        new LegSubsystem(
+            DeviceIDs.rightLegMotor,
             Legs.Positions.rightDownPosition,
             Legs.Positions.rightUpPosition,
             true);
 
-    leftArm = new ArmSubsystem(
-        DeviceIDs.leftArmMotor,
-        Arms.Positions.leftMinPosition,
-        Arms.Positions.leftMaxPosition,
-        false);
+    leftArm =
+        new ArmSubsystem(
+            DeviceIDs.leftArmMotor,
+            Arms.Positions.leftMaxPosition,
+            Arms.Positions.leftMinPosition,
+            false);
 
-        
-    leftArm = new ArmSubsystem(
-        DeviceIDs.leftArmMotor,
-        Arms.Positions.leftMinPosition,
-        Arms.Positions.leftMaxPosition,
-        false);
+    rightArm =
+        new ArmSubsystem(
+            DeviceIDs.rightArmMotor,
+            Arms.Positions.rightMaxPosition,
+            Arms.Positions.rightMinPosition,
+            true);
     configureBindings();
   }
 
@@ -72,6 +73,7 @@ public class RobotContainer {
             () -> {
               rightLeg.toggleHoldPosition();
               leftLeg.toggleHoldPosition();
+              rightArm.toggleHoldPosition();
             });
 
     BooleanEvent updatePIDs = new BooleanEvent(loop, () -> controller.getAButton());
@@ -81,26 +83,38 @@ public class RobotContainer {
         .ifHigh(
             () -> {
               double[] PID = shuffle.getPID("PID Tuner");
-              //Simply change the below line to tune PIDs for another object.
-              leftLeg.setPID(PID);
+              // Simply change the below line to tune PIDs for another object.
+              rightArm.setPID(PID);
               System.out.println("UPDATING PIDS");
             });
   }
 
   public void pollLoop() {
     loop.poll();
-    leftLeg.run();
-    rightLeg.run();
+    // leftLeg.run();
+    // rightLeg.run();
+    // leftArm.run();
+    rightArm.run();
     updateShuffle();
   }
 
   public void updateShuffle() {
     shuffle.setTab("Status");
 
+    shuffle.setLayout("Left Leg", 1, 2);
     shuffle.setBoolean("Left Leg Up", leftLeg.isUp());
     shuffle.setBoolean("Left Leg Locked", leftLeg.isLocked());
 
+    shuffle.setLayout("Right Leg", 1, 2);
     shuffle.setBoolean("Right Leg Up", rightLeg.isUp());
     shuffle.setBoolean("Right Leg Locked", rightLeg.isLocked());
+
+    shuffle.setLayout("Left Arm", 1, 2);
+    shuffle.setNumber("Left Arm Position", leftArm.getEncoderPosition());
+    shuffle.setBoolean("Left Arm Locked", leftArm.isLocked());
+
+    shuffle.setLayout("Right Arm", 1, 2);
+    shuffle.setNumber("Right Arm Position", rightArm.getEncoderPosition());
+    shuffle.setBoolean("Right Arm Locked", rightArm.isLocked());
   }
 }

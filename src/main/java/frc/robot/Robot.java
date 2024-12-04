@@ -4,14 +4,10 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import java.io.File;
-import java.io.IOException;
-import swervelib.parser.SwerveParser;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -58,6 +54,8 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
     m_robotContainer.leftLeg.setHoldPosition(false);
     m_robotContainer.rightLeg.setHoldPosition(false);
+    m_robotContainer.rightArm.setHoldPosition(false);
+    m_robotContainer.leftArm.setHoldPosition(false);
   }
 
   @Override
@@ -85,24 +83,20 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    m_robotContainer.rightArm.moveFromRange(m_robotContainer.controller.getRightY());
+    // m_robotContainer.leftArm.moveFromRange(m_robotContainer.controller.getLeftY());
+  }
 
   @Override
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
-    try {
-      new SwerveParser(new File(Filesystem.getDeployDirectory(), "swerve"));
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {
-    m_robotContainer.rightArm.moveFromRange(m_robotContainer.controller.getRightY());
-  }
+  public void testPeriodic() {}
 
   /** This function is called once when the robot is first started up. */
   @Override
@@ -110,6 +104,5 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically whilst in simulation. */
   @Override
-  public void simulationPeriodic() {
-  }
+  public void simulationPeriodic() {}
 }
