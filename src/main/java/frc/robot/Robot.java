@@ -54,8 +54,8 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
     m_robotContainer.leftLeg.setHoldPosition(false);
     m_robotContainer.rightLeg.setHoldPosition(false);
-    m_robotContainer.rightArm.setHoldPosition(false);
-    m_robotContainer.leftArm.setHoldPosition(false);
+    m_robotContainer.rightArm.setEnabled(false);
+    m_robotContainer.leftArm.setEnabled(false);
   }
 
   @Override
@@ -84,8 +84,8 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    m_robotContainer.rightArm.moveFromRange(m_robotContainer.controller.getRightY());
-    // m_robotContainer.leftArm.moveFromRange(m_robotContainer.controller.getLeftY());
+    m_robotContainer.rightArm.moveFromRange(-1, 1, m_robotContainer.controller.getRightY());
+    m_robotContainer.leftArm.moveFromRange(-1, 1, m_robotContainer.controller.getLeftY());
   }
 
   @Override

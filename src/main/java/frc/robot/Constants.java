@@ -43,24 +43,31 @@ public final class Constants {
 
   public final class Arms {
 
-    public class PID {
-      public static final double P = 0.003;
+    public class RightPID {
+      public static final double P = 0.005;
       public static final double I = 0;
       public static final double D = 0.001;
     }
 
+    public class LeftPID {
+      public static final double P = 0.009;
+      public static final double I = 0;
+      public static final double D = 0.004;
+    }
+
     public class Positions {
-      public static final double leftMaxPosition = 210; // 217
-      public static final double leftMinPosition = 180; // 171
+      public static final double leftMaxPosition = 270; // 217
+      public static final double leftMinPosition = 212; // 171
 
-      public static final double rightMaxPosition = 300; // 292
-      public static final double rightMinPosition = 240; // 232
+      public static final double rightMaxPosition = 320; // 292
+      public static final double rightMinPosition = 230; // 232
 
-      public static final double stopRange = 2;
+      public static final double upperStopRange = 2;
+      public static final double lowerStopRange = 5;
     }
 
     public final class motorControllerConfigurations {
-      public static final int currentLimit = 10;
+      public static final int currentLimit = 40;
     }
   }
 

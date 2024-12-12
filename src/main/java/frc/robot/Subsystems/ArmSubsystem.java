@@ -13,27 +13,23 @@ public class ArmSubsystem extends SubsystemBase {
   private AbsoluteEncoder encoder;
   private SparkPIDController PIDController;
 
-  private double upPositionEncoderValue;
-  private double downPositionEncoderValue;
-
-  private double stopRange = Arms.Positions.stopRange;
-
   private double currentPosition;
-  private double setPoint;
-  private boolean holdPosition = false;
-  private boolean upPosition = false;
+  private double setPosition;
+  private double upPosition;
+  private double downPosition;
+
+  private double upperStopRange = Arms.Positions.upperStopRange;
+  private double lowerStopRange = Arms.Positions.lowerStopRange;
+
+  private boolean enabled = false;
   private int PIDSlot = 0;
 
-  public ArmSubsystem(
-      int deviceID,
-      double upPositionEncoderValue,
-      double downPositionEncoderValue,
-      boolean isInverted) {
+  public ArmSubsystem(int deviceID, double upPosition, double downPosition, boolean isInverted) {
 
-    this.upPositionEncoderValue = upPositionEncoderValue;
-    this.downPositionEncoderValue = downPositionEncoderValue;
-    setPoint = downPositionEncoderValue;
-    setPoint = downPositionEncoderValue;
+    this.upPosition = upPosition;
+    this.downPosition = downPosition;
+    setPosition = downPosition;
+    setPosition = downPosition;
 
     motor = new CANSparkMax(deviceID, MotorType.kBrushless);
     encoder = motor.getAbsoluteEncoder();
@@ -43,9 +39,9 @@ public class ArmSubsystem extends SubsystemBase {
     motor.setInverted(isInverted);
     motor.burnFlash();
 
-    PIDController.setP(Arms.PID.P);
-    PIDController.setI(Arms.PID.I);
-    PIDController.setD(Arms.PID.D);
+    PIDController.setP(0);
+    PIDController.setI(0);
+    PIDController.setD(0);
     PIDController.setFF(0);
     PIDController.setIZone(1.5, PIDSlot);
     PIDController.setFeedbackDevice(encoder);
@@ -53,73 +49,66 @@ public class ArmSubsystem extends SubsystemBase {
     PIDController.setOutputRange(-1, 1);
   }
 
-  public void toggleHoldPosition() {
-    holdPosition = !holdPosition;
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
   }
 
-  public void setHoldPosition(boolean holdPosition) {
-    this.holdPosition = holdPosition;
-  }
-
-  public void togglePosition() {
-    upPosition = !upPosition;
-    if (upPosition) {
-      this.setPoint = upPositionEncoderValue;
-    } else {
-      this.setPoint = downPositionEncoderValue;
-    }
+  public boolean isEnabled() {
+    return enabled;
   }
 
   public void run() {
     currentPosition = encoder.getPosition();
-    if (holdPosition && withinSoftLimits()) {
-      PIDController.setReference(setPoint, CANSparkMax.ControlType.kPosition, PIDSlot);
+    if (enabled) {
+      if (setPosition > currentPosition) {
+        if (!withinUpperLimits()) return;
+      } else {
+        if (!withinLowerLimits()) return;
+      }
+      PIDController.setReference(setPosition, CANSparkMax.ControlType.kPosition, PIDSlot);
     } else {
       motor.set(0);
     }
   }
 
-  private boolean withinSoftLimits() {
-    if (currentPosition < upPositionEncoderValue - stopRange
-        && currentPosition > downPositionEncoderValue + stopRange) {
-      return true;
-    }
-    // System.out.println(
-    //     "SOFT LIMITS: "
-    //         + (downPositionEncoderValue - Arms.Positions.stopRange)
-    //         + " | "
-    //         + currentPosition
-    //         + " | "
-    //         + upPositionEncoderValue
-    //         + Arms.Positions.stopRange);
-    return false;
+  private boolean withinUpperLimits() {
+    return (currentPosition < upPosition - upperStopRange);
   }
 
-  public void moveFromRange(double position) {
-    if (position > 1) position = 1;
-    if (position < -1) position = -1;
+  private boolean withinLowerLimits() {
+    return (currentPosition > downPosition - lowerStopRange);
+  }
 
-    position =
-        (position + 1) / 2 * (upPositionEncoderValue - downPositionEncoderValue)
-            + downPositionEncoderValue;
+  /**
+   * Moves the arm to a position based on where an input is within a given range.
+   *
+   * @param rangeMax the maximum value of the range
+   * @param rangeMin the minimum value of the range
+   * @param input the value within this range to map the arm position to
+   */
+  public void moveFromRange(double rangeMin, double rangeMax, double input) {
+    if (input > rangeMax) input = rangeMax;
+    if (input < rangeMin) input = rangeMin;
 
-    if (position > 1) position = 1;
-    if (position < -1) position = -1;
-
-    position =
-        (position + 1) / 2 * (upPositionEncoderValue - downPositionEncoderValue)
-            + downPositionEncoderValue;
+    double position =
+        (input - rangeMin) / (rangeMax - rangeMin) * (upPosition - downPosition) + downPosition;
 
     moveToAngle(position);
     System.out.println(position);
   }
 
-  public void moveToAngle(double setPoint) {
-    this.setPoint = setPoint;
+  public void moveToAngle(double setPosition) {
+    this.setPosition = setPosition;
   }
 
-  public double getEncoderPosition() {
+  public double getPosition() {
     return currentPosition;
+  }
+
+  public void setPID(double P, double I, double D) {
+    PIDController.setP(P);
+    PIDController.setI(I);
+    PIDController.setD(D);
   }
 
   public void setPID(double[] PID) {
@@ -128,11 +117,11 @@ public class ArmSubsystem extends SubsystemBase {
     PIDController.setD(PID[2]);
   }
 
-  public boolean isUp() {
-    return upPosition;
+  public double[] getPID() {
+    return new double[] {PIDController.getP(), PIDController.getI(), PIDController.getD()};
   }
 
-  public boolean isLocked() {
-    return holdPosition;
+  public double getCurrent() {
+    return motor.getOutputCurrent();
   }
 }

@@ -42,9 +42,11 @@ public class RobotContainer {
     leftArm =
         new ArmSubsystem(
             DeviceIDs.leftArmMotor,
-            Arms.Positions.leftMinPosition,
             Arms.Positions.leftMaxPosition,
+            Arms.Positions.leftMinPosition,
             false);
+
+    leftArm.setPID(Arms.LeftPID.P, Arms.LeftPID.I, Arms.LeftPID.D);
 
     rightArm =
         new ArmSubsystem(
@@ -52,11 +54,15 @@ public class RobotContainer {
             Arms.Positions.rightMaxPosition,
             Arms.Positions.rightMinPosition,
             true);
+
+    rightArm.setPID(Arms.RightPID.P, Arms.RightPID.I, Arms.RightPID.D);
+
     configureBindings();
   }
 
   private void configureBindings() {
-    shuffle.setPID("PID Tuner", 1, 0, 0);
+    shuffle.setPID("PID Tuner", Arms.RightPID.P, Arms.RightPID.I, Arms.RightPID.D);
+    shuffle.setTab("PID");
 
     // BooleanEvent toggleLeftLeg = new BooleanEvent(loop, () -> controller.getXButton());
 
@@ -66,9 +72,9 @@ public class RobotContainer {
 
     // toggleRightLeg.rising().ifHigh(() -> rightLeg.togglePosition());
 
-    BooleanEvent toggleRightArm = new BooleanEvent(loop, () -> controller.getBButton());
+    // BooleanEvent toggleRightArm = new BooleanEvent(loop, () -> controller.getBButton());
 
-    toggleRightArm.rising().ifHigh(() -> rightArm.togglePosition());
+    // toggleRightArm.rising().ifHigh(() -> rightArm.togglePosition());
 
     BooleanEvent toggleSafeMode = new BooleanEvent(loop, () -> controller.getYButton());
 
@@ -78,8 +84,8 @@ public class RobotContainer {
             () -> {
               rightLeg.toggleHoldPosition();
               leftLeg.toggleHoldPosition();
-              rightArm.toggleHoldPosition();
-              leftArm.toggleHoldPosition();
+              rightArm.setEnabled(!rightArm.isEnabled());
+              leftArm.setEnabled(!rightArm.isEnabled());
             });
 
     BooleanEvent updatePIDs = new BooleanEvent(loop, () -> controller.getAButton());
@@ -116,11 +122,13 @@ public class RobotContainer {
     shuffle.setBoolean("Right Leg Locked", rightLeg.isLocked());
 
     shuffle.setLayout("Left Arm", 1, 2);
-    shuffle.setNumber("Left Arm Position", leftArm.getEncoderPosition());
-    shuffle.setBoolean("Left Arm Locked", leftArm.isLocked());
+    shuffle.setNumber("Left Arm Position", leftArm.getPosition());
+    shuffle.setBoolean("Left Arm Enabled", leftArm.isEnabled());
+    shuffle.setNumber("Left Arm Current", leftArm.getCurrent());
 
     shuffle.setLayout("Right Arm", 1, 2);
-    shuffle.setNumber("Right Arm Position", rightArm.getEncoderPosition());
-    shuffle.setBoolean("Right Arm Locked", rightArm.isLocked());
+    shuffle.setNumber("Right Arm Position", rightArm.getPosition());
+    shuffle.setBoolean("Right Arm Enabled", rightArm.isEnabled());
+    shuffle.setNumber("Right Arm Current", rightArm.getCurrent());
   }
 }
