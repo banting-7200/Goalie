@@ -26,8 +26,8 @@ public final class Constants {
     }
 
     public class Positions {
-      public static final double leftUpPosition = 240;
-      public static final double leftDownPosition = 176;
+      public static final double leftUpPosition = 239;
+      public static final double leftDownPosition = 175;
 
       public static final double rightUpPosition = 130;
       public static final double rightDownPosition = 52;
@@ -57,7 +57,7 @@ public final class Constants {
 
     public class Positions {
       public static final double leftMaxPosition = 270; // 217
-      public static final double leftMinPosition = 212; // 171
+      public static final double leftMinPosition = 222; // 171
 
       public static final double rightMaxPosition = 320; // 292
       public static final double rightMinPosition = 230; // 232
