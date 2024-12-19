@@ -83,7 +83,7 @@ public class RobotContainer {
               rightLeg.setEnabled(!rightLeg.isEnabled());
               leftLeg.setEnabled(!leftLeg.isEnabled());
               rightArm.setEnabled(!rightArm.isEnabled());
-              leftArm.setEnabled(!rightArm.isEnabled());
+              leftArm.setEnabled(!leftArm.isEnabled());
             });
 
     BooleanEvent updatePIDs =
