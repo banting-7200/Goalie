@@ -62,33 +62,33 @@ public class RobotContainer {
 
   private void configureBindings() {
     shuffle.setPID("PID Tuner", Arms.RightPID.P, Arms.RightPID.I, Arms.RightPID.D);
-    shuffle.setTab("PID");
 
-    // BooleanEvent toggleLeftLeg = new BooleanEvent(loop, () -> controller.getXButton());
+    BooleanEvent toggleLeftLeg =
+        new BooleanEvent(
+            loop, () -> controller.getRawButton(Controls.XboxController.leftLegToggleButton));
+    toggleLeftLeg.rising().ifHigh(() -> leftLeg.togglePosition());
 
-    // toggleLeftLeg.rising().ifHigh(() -> leftLeg.togglePosition());
+    BooleanEvent toggleRightLeg =
+        new BooleanEvent(
+            loop, () -> controller.getRawButton(Controls.XboxController.rightLegToggleButton));
+    toggleRightLeg.rising().ifHigh(() -> rightLeg.togglePosition());
 
-    // BooleanEvent toggleRightLeg = new BooleanEvent(loop, () -> controller.getBButton());
-
-    // toggleRightLeg.rising().ifHigh(() -> rightLeg.togglePosition());
-
-    // BooleanEvent toggleRightArm = new BooleanEvent(loop, () -> controller.getBButton());
-
-    // toggleRightArm.rising().ifHigh(() -> rightArm.togglePosition());
-
-    BooleanEvent toggleSafeMode = new BooleanEvent(loop, () -> controller.getYButton());
+    BooleanEvent toggleSafeMode =
+        new BooleanEvent(loop, () -> controller.getRawButton(Controls.XboxController.enableButton));
 
     toggleSafeMode
         .rising()
         .ifHigh(
             () -> {
-              rightLeg.toggleHoldPosition();
-              leftLeg.toggleHoldPosition();
+              rightLeg.setEnabled(!rightLeg.isEnabled());
+              leftLeg.setEnabled(!leftLeg.isEnabled());
               rightArm.setEnabled(!rightArm.isEnabled());
               leftArm.setEnabled(!rightArm.isEnabled());
             });
 
-    BooleanEvent updatePIDs = new BooleanEvent(loop, () -> controller.getAButton());
+    BooleanEvent updatePIDs =
+        new BooleanEvent(
+            loop, () -> controller.getRawButton(Controls.XboxController.updatePIDsButton));
 
     updatePIDs
         .rising()
@@ -101,11 +101,11 @@ public class RobotContainer {
             });
   }
 
-  public void pollLoop() {
+  public void periodic() {
     loop.poll();
-    // leftLeg.run();
-    // rightLeg.run();
-    // leftArm.run();
+    leftLeg.run();
+    rightLeg.run();
+    leftArm.run();
     rightArm.run();
     updateShuffle();
   }
@@ -115,11 +115,11 @@ public class RobotContainer {
 
     shuffle.setLayout("Left Leg", 1, 2);
     shuffle.setBoolean("Left Leg Up", leftLeg.isUp());
-    shuffle.setBoolean("Left Leg Locked", leftLeg.isLocked());
+    shuffle.setBoolean("Left Leg Locked", leftLeg.isEnabled());
 
     shuffle.setLayout("Right Leg", 1, 2);
     shuffle.setBoolean("Right Leg Up", rightLeg.isUp());
-    shuffle.setBoolean("Right Leg Locked", rightLeg.isLocked());
+    shuffle.setBoolean("Right Leg Locked", rightLeg.isEnabled());
 
     shuffle.setLayout("Left Arm", 1, 2);
     shuffle.setNumber("Left Arm Position", leftArm.getPosition());

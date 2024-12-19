@@ -77,4 +77,15 @@ public final class Constants {
     public static final int leftArmMotor = 4;
     public static final int rightArmMotor = 3;
   }
+
+  public final class Controls {
+    public final class XboxController {
+      public static final int updatePIDsButton = 1;
+      public static final int leftLegToggleButton = 3;
+      public static final int rightLegToggleButton = 2;
+      public static final int enableButton = 4;
+      public static final int leftArmChannel = 1;
+      public static final int rightArmChannel = 3;
+    }
+  }
 }

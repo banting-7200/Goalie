@@ -17,25 +17,19 @@ public class LegSubsystem extends SubsystemBase {
   private double upperStopRange = Legs.Positions.upperStopRange;
   private double lowerStopRange = Legs.Positions.lowerStopRange;
 
-  private double upPositionEncoderValue;
-  private double downPositionEncoderValue;
+  private double upPosition;
+  private double downPosition;
   private double currentPosition;
-  private double setPoint;
+  private double setPosition;
 
-  private boolean legPositionUp = true;
-  private boolean holdPosition = false;
+  private boolean isUp = true;
+  private boolean enabled = false;
 
-  private int PIDSlot = 0;
+  public LegSubsystem(int deviceID, double downPosition, double upPosition, boolean isInverted) {
 
-  public LegSubsystem(
-      int deviceID,
-      double downPositionEncoderValue,
-      double upPositionEncoderValue,
-      boolean isInverted) {
-
-    this.downPositionEncoderValue = downPositionEncoderValue;
-    this.upPositionEncoderValue = upPositionEncoderValue;
-    setPoint = upPositionEncoderValue;
+    this.downPosition = downPosition;
+    this.upPosition = upPosition;
+    setPosition = upPosition;
 
     motor = new CANSparkMax(deviceID, MotorType.kBrushless);
     encoder = motor.getAbsoluteEncoder();
@@ -45,12 +39,11 @@ public class LegSubsystem extends SubsystemBase {
     PIDController.setI(Legs.PID.I);
     PIDController.setD(Legs.PID.D);
     PIDController.setFF(0);
-    PIDController.setIZone(1.5, PIDSlot);
+    PIDController.setIZone(1.5);
     PIDController.setOutputRange(-1, 1);
     PIDController.setFeedbackDevice(encoder);
     PIDController.setPositionPIDWrappingEnabled(false);
 
-    // motor.restoreFactoryDefaults();
     motor.setSmartCurrentLimit(Legs.motorControllerConfigurations.currentLimit);
     motor.setIdleMode(IdleMode.kBrake);
     motor.setInverted(isInverted);
@@ -58,47 +51,39 @@ public class LegSubsystem extends SubsystemBase {
   }
 
   public void togglePosition() {
-    legPositionUp = !legPositionUp;
-    if (legPositionUp) {
-      setPositionSetPoint(upPositionEncoderValue);
+    isUp = !isUp;
+    if (isUp) {
+      setPositionsetPosition(upPosition);
     } else {
-      setPositionSetPoint(downPositionEncoderValue);
+      setPositionsetPosition(downPosition);
     }
-    // setPositionSetPoint(90);
-
   }
 
-  public void toggleHoldPosition() {
-    this.holdPosition = !this.holdPosition;
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
   }
 
-  public void setHoldPosition(boolean holdPosition) {
-    this.holdPosition = holdPosition;
+  public void setPositionsetPosition(double setPosition) {
+    this.setPosition = setPosition;
   }
 
-  public void setPositionSetPoint(double setPoint) {
-    this.setPoint = setPoint;
-  }
-
-  public double getCurrentSetPoint() {
-    return setPoint;
+  public double getCurrentsetPosition() {
+    return setPosition;
   }
 
   public void run() {
     currentPosition = encoder.getPosition();
-    if (legPositionUp && holdPosition) {
+    if (isUp && enabled) {
       if (withinUpperSoftLimits()) {
-        PIDController.setReference(setPoint, CANSparkMax.ControlType.kPosition, PIDSlot);
+        PIDController.setReference(setPosition, CANSparkMax.ControlType.kPosition);
       } else {
         motor.set(0);
-        // System.out.println("upper soft");
       }
-    } else if (!legPositionUp && holdPosition) {
+    } else if (!isUp && enabled) {
       if (withinLowerSoftLimits()) {
-        PIDController.setReference(setPoint, CANSparkMax.ControlType.kPosition, PIDSlot);
+        PIDController.setReference(setPosition, CANSparkMax.ControlType.kPosition);
       } else {
         motor.set(0);
-        // System.out.println("lower soft");
       }
     } else {
       motor.set(0);
@@ -108,31 +93,31 @@ public class LegSubsystem extends SubsystemBase {
   private boolean withinLowerSoftLimits() {
     // System.out.println(
     //     "LOWER SOFT LIMITS "
-    //         + downPositionEncoderValue
+    //         + downPosition
     //         + " || "
     //         + currentPosition
     //         + " || "
-    //         + upPositionEncoderValue);
-    return (currentPosition > downPositionEncoderValue + lowerStopRange);
+    //         + upPosition);
+    return (currentPosition > downPosition + lowerStopRange);
   }
 
   private boolean withinUpperSoftLimits() {
     // System.out.println(
     //     "UPPER SOFT LIMITS "
-    //         + downPositionEncoderValue
+    //         + downPosition
     //         + " || "
     //         + currentPosition
     //         + " || "
-    //         + upPositionEncoderValue);
-    return (currentPosition < upPositionEncoderValue - upperStopRange);
+    //         + upPosition);
+    return (currentPosition < upPosition - upperStopRange);
   }
 
   public boolean isUp() {
-    return legPositionUp;
+    return isUp;
   }
 
-  public boolean isLocked() {
-    return holdPosition;
+  public boolean isEnabled() {
+    return enabled;
   }
 
   public void setPID(double[] PID) {

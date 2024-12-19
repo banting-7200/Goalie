@@ -22,7 +22,6 @@ public class ArmSubsystem extends SubsystemBase {
   private double lowerStopRange = Arms.Positions.lowerStopRange;
 
   private boolean enabled = false;
-  private int PIDSlot = 0;
 
   public ArmSubsystem(int deviceID, double upPosition, double downPosition, boolean isInverted) {
 
@@ -43,7 +42,7 @@ public class ArmSubsystem extends SubsystemBase {
     PIDController.setI(0);
     PIDController.setD(0);
     PIDController.setFF(0);
-    PIDController.setIZone(1.5, PIDSlot);
+    PIDController.setIZone(1.5);
     PIDController.setFeedbackDevice(encoder);
     PIDController.setPositionPIDWrappingEnabled(false);
     PIDController.setOutputRange(-1, 1);
@@ -65,7 +64,7 @@ public class ArmSubsystem extends SubsystemBase {
       } else {
         if (!withinLowerLimits()) return;
       }
-      PIDController.setReference(setPosition, CANSparkMax.ControlType.kPosition, PIDSlot);
+      PIDController.setReference(setPosition, CANSparkMax.ControlType.kPosition);
     } else {
       motor.set(0);
     }

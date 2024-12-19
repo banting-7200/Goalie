@@ -151,7 +151,7 @@ public class ShuffleboardSubsystem extends SubsystemBase {
   public void setPID(String name, double p, double i, double d) { // create a named list layout of
     // PID values.
     setTab("PID");
-    setLayout(name, 2, 4);
+    setLayout(name, 1, 2);
     setNumber(name + " P", p, 0, 0);
     setNumber(name + " I", i, 0, 1);
     setNumber(name + " D", d, 0, 2);
