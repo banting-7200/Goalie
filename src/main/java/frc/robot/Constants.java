@@ -86,6 +86,7 @@ public final class Constants {
       public static final int enableButton = 4;
       public static final int leftArmChannel = 1;
       public static final int rightArmChannel = 3;
+      public static final int clearCameraDataButton = 5;
     }
   }
 }

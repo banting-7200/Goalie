@@ -7,8 +7,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
+import frc.robot.Commands.VelocityTracker;
 import frc.robot.Constants.*;
 import frc.robot.Subsystems.*;
+import frc.robot.Subsystems.Camera;
 
 public class RobotContainer {
 
@@ -19,6 +21,9 @@ public class RobotContainer {
   public LegSubsystem rightLeg;
   public ArmSubsystem leftArm;
   public ArmSubsystem rightArm;
+
+  public Camera camera1;
+  public VelocityTracker velocityTracker;
 
   private EventLoop loop = new EventLoop();
   private ShuffleboardSubsystem shuffle = ShuffleboardSubsystem.getInstance();
@@ -56,6 +61,10 @@ public class RobotContainer {
             true);
 
     rightArm.setPID(Arms.RightPID.P, Arms.RightPID.I, Arms.RightPID.D);
+
+    camera1 = Camera.getInstance();
+    velocityTracker = new VelocityTracker();
+    velocityTracker.addCamera(camera1, 0.36, 0.2, 0.75, 1, -1, 0);
 
     configureBindings();
   }
@@ -99,6 +108,12 @@ public class RobotContainer {
               rightArm.setPID(PID);
               System.out.println("UPDATING PIDS");
             });
+
+    BooleanEvent clearCameraData =
+        new BooleanEvent(
+            loop, () -> controller.getRawButton(Controls.XboxController.clearCameraDataButton));
+
+    clearCameraData.rising().ifHigh(() -> velocityTracker.clearData());
   }
 
   public void periodic() {
@@ -108,6 +123,7 @@ public class RobotContainer {
     leftArm.run();
     rightArm.run();
     updateShuffle();
+    velocityTracker.printData(camera1);
   }
 
   public void updateShuffle() {

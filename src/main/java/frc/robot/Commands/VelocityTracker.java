@@ -6,9 +6,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class VelocityTracker extends SubsystemBase {
+  ArrayList<CameraData> dataList;
+
+  public VelocityTracker() {
+    dataList = new ArrayList<>();
+  }
 
   // Subclasses //
-  private class CameraData {
+  public class CameraData {
     // Data //
     private final double[] areas = new double[2];
     private final double[] distances = new double[2];
@@ -19,23 +24,33 @@ public class VelocityTracker extends SubsystemBase {
     private final ArrayList<Double> horizontalAngles = new ArrayList<>();
     private final ArrayList<Double> verticalAngles = new ArrayList<>();
 
-    public long prevTime;
-    public long currTime = System.currentTimeMillis() / 1000;
+    private long prevTime;
+    private long currTime = System.currentTimeMillis();
 
     private final Camera camera;
     private final double nearArea;
     private final double farArea;
     private final double nearDistance;
     private final double farDistance;
+    private final double xOffset;
+    private final double yOffset;
 
     // Constructor //
     public CameraData(
-        Camera camera, double nearArea, double farArea, double nearDistance, double farDistance) {
+        Camera camera,
+        double nearArea,
+        double farArea,
+        double nearDistance,
+        double farDistance,
+        double xOffset,
+        double yOffset) {
       this.camera = camera;
       this.nearArea = nearArea;
       this.farArea = farArea;
       this.nearDistance = nearDistance;
       this.farDistance = farDistance;
+      this.xOffset = xOffset;
+      this.yOffset = yOffset;
     }
 
     private void clearData() {
@@ -54,11 +69,11 @@ public class VelocityTracker extends SubsystemBase {
     }
 
     private void addHorizontalAngle(double angle) {
-      horizontalAngles.add(angle);
+      if (!Double.isNaN(angle)) horizontalAngles.add(angle);
     }
 
     private void addVerticalAngle(double angle) {
-      verticalAngles.add(angle);
+      if (!Double.isNaN(angle)) verticalAngles.add(angle);
     }
 
     private void addYaw(double yaw) {
@@ -81,22 +96,18 @@ public class VelocityTracker extends SubsystemBase {
     }
   }
 
-  // Arrays //
-  CameraData[] dataList = new CameraData[0];
-
   // Base Methods //
   public void addCamera(
-      Camera camera, double nearArea, double farArea, double nearDistance, double farDistance) {
+      Camera camera,
+      double nearArea,
+      double farArea,
+      double nearDistance,
+      double farDistance,
+      double yOffset,
+      double xOffset) {
     // Initialize Data //
-    int currentLength = dataList.length;
-    // Save Old Data //
-    CameraData[] oldData = dataList.clone();
-    // Adjust Size //
-    dataList = new CameraData[currentLength + 1];
-    // Add back old data //
-    for (int i = 0; i < dataList.length; i++) dataList[i] = oldData[i];
-    // Add Camera //
-    dataList[currentLength] = new CameraData(camera, nearArea, farArea, nearDistance, farDistance);
+    dataList.add(
+        new CameraData(camera, nearArea, farArea, nearDistance, farDistance, yOffset, xOffset));
   }
 
   public CameraData getCameraData(Camera camera) {
@@ -119,8 +130,10 @@ public class VelocityTracker extends SubsystemBase {
     double nearDistance = cameraData.nearDistance;
     double farDistance = cameraData.farDistance;
 
-    double distanceEstimate =
-        (area - nearArea) / (farArea - nearArea) * (farDistance - nearDistance) + nearDistance;
+    double distanceEstimate = 1 / (area * 37.2742) + 0.839629;
+    // (area - nearArea) / (farArea - nearArea) * (farDistance - nearDistance) + nearDistance;
+    // nearDistance + (farDistance - nearDistance) * ((area - nearArea) / (farArea - nearArea));
+
     return distanceEstimate;
   }
 
@@ -131,7 +144,7 @@ public class VelocityTracker extends SubsystemBase {
     double distance1 = data.distances[1];
     double distance2 = data.distances[0];
     // Calculations //
-    double speed = (distance2 - distance1) / (data.currTime - data.prevTime);
+    double speed = 1000 * (distance1 - distance2) / (data.currTime - data.prevTime);
     // Return //
     return speed;
   }
@@ -183,7 +196,7 @@ public class VelocityTracker extends SubsystemBase {
       for (double speed : data.speeds) {
         avgSpeed += speed;
       }
-      speedCount = data.speeds.size();
+      speedCount += data.speeds.size();
     }
     avgSpeed /= speedCount;
     return avgSpeed;
@@ -225,7 +238,7 @@ public class VelocityTracker extends SubsystemBase {
       // Data //
       if (camera.hasTarget()) {
         data.prevTime = data.currTime;
-        data.currTime = System.currentTimeMillis() / 1000;
+        data.currTime = System.currentTimeMillis();
 
         data.addArea(camera.getTargetArea());
         data.addYaw(camera.getTargetYaw());
@@ -241,22 +254,56 @@ public class VelocityTracker extends SubsystemBase {
     }
   }
 
-  public int getQuadrant() {
-    int quadrant = 0;
-    if (getAverageHorizontalAngle() > 0) quadrant = 1;
-    else quadrant = 2;
+  public int getQuadrant(Camera camera) {
+    CameraData data = getCameraData(camera);
+    int quadrant = 1;
+    double xOffset = data.xOffset;
+    double yOffset = data.yOffset;
+
+    // double yaw = data.yaws[0];
+    // double incHor = getAverageHorizontalAngle() + yaw;
+    // double horizontalEndpoint = getRecentDistance(camera);
+    // horizontalEndpoint *= Math.sin(Math.toRadians(incHor + yaw));
+    // horizontalEndpoint /= Math.sin(Math.toRadians(180 - incHor));
+    // horizontalEndpoint += xOffset;
+
+    // double pitch = data.pitches[0];
+    // double incVer = getAverageVerticalAngle() + pitch;
+    // double verticalEndpoint = getRecentDistance(camera);
+    // verticalEndpoint *= Math.sin(Math.toRadians(incVer + pitch));
+    // verticalEndpoint /= Math.sin(Math.toRadians(180 - incVer));
+    // verticalEndpoint += yOffset;
+
+    // int quadrant = 0;
+    // if (horizontalEndpoint > 0) quadrant = 1;
+    // else quadrant = 2;
+    // if (verticalEndpoint < 0) quadrant += 2;
+    // return quadrant;
+
+    // goalies perspective
     if (getAverageVerticalAngle() < 0) quadrant += 2;
+    if (getAverageHorizontalAngle() > 0) quadrant += 1;
     return quadrant;
   }
 
-  public void printData() {
-    System.out.println(
-        "Vertical Angle: "
-            + getAverageVerticalAngle()
-            + "degrees, Horizontal Angle: "
-            + getAverageHorizontalAngle()
-            + "degrees, Speed: "
-            + getAverageSpeed()
-            + "m/s");
+  public void printData(Camera camera) {
+    if (camera.hasTarget()) {
+      System.out.println(
+          // "Vertical Angle: "
+          // + getAverageVerticalAngle()
+          // + "degrees, Horizontal Angle: "
+          // + getAverageHorizontalAngle()
+          // + "degrees, Speed: "
+          // + getAverageSpeed()
+          // + "m/s, quadrant: "
+          // + getQuadrant(camera));
+          "q: " + getQuadrant(camera));
+    }
+  }
+
+  public void clearData() {
+    for (CameraData data : dataList) {
+      data.clearData();
+    }
   }
 }
