@@ -7,8 +7,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
+import frc.robot.Commands.VelocityTracker;
 import frc.robot.Constants.*;
 import frc.robot.Subsystems.*;
+import frc.robot.Subsystems.Camera;
 
 public class RobotContainer {
 
@@ -19,6 +21,9 @@ public class RobotContainer {
   public LegSubsystem rightLeg;
   public ArmSubsystem leftArm;
   public ArmSubsystem rightArm;
+
+  public Camera camera1;
+  public VelocityTracker velocityTracker;
   public LightsSubsystem lights;
 
   private EventLoop loop = new EventLoop();
@@ -60,21 +65,20 @@ public class RobotContainer {
 
     rightArm.setPID(Arms.RightPID.P, Arms.RightPID.I, Arms.RightPID.D);
 
-    lights = new LightsSubsystem(4, 5);
-
     configureBindings();
   }
 
   private void configureBindings() {
     shuffle.setPID("PID Tuner", Arms.RightPID.P, Arms.RightPID.I, Arms.RightPID.D);
-    shuffle.setTab("PID");
 
-    BooleanEvent toggleLeftLeg = new BooleanEvent(loop, () -> controller.getXButton());
-
+    BooleanEvent toggleLeftLeg =
+        new BooleanEvent(
+            loop, () -> controller.getRawButton(Controls.XboxController.leftLegToggleButton));
     toggleLeftLeg.rising().ifHigh(() -> leftLeg.togglePosition());
 
-    BooleanEvent toggleRightLeg = new BooleanEvent(loop, () -> controller.getBButton());
-
+    BooleanEvent toggleRightLeg =
+        new BooleanEvent(
+            loop, () -> controller.getRawButton(Controls.XboxController.rightLegToggleButton));
     toggleRightLeg.rising().ifHigh(() -> rightLeg.togglePosition());
 
     // Comment toggleRightArm if using joystick to control
@@ -82,19 +86,22 @@ public class RobotContainer {
 
     toggleRightArm.rising().ifHigh(() -> rightArm.toggleArmPosition());
 
-    BooleanEvent toggleSafeMode = new BooleanEvent(loop, () -> controller.getYButton());
+    BooleanEvent toggleSafeMode =
+        new BooleanEvent(loop, () -> controller.getRawButton(Controls.XboxController.enableButton));
 
     toggleSafeMode
         .rising()
         .ifHigh(
             () -> {
-              rightLeg.toggleHoldPosition();
-              leftLeg.toggleHoldPosition();
+              rightLeg.setEnabled(!rightLeg.isEnabled());
+              leftLeg.setEnabled(!leftLeg.isEnabled());
               rightArm.setEnabled(!rightArm.isEnabled());
               leftArm.setEnabled(!leftArm.isEnabled());
             });
 
-    BooleanEvent updatePIDs = new BooleanEvent(loop, () -> controller.getAButton());
+    BooleanEvent updatePIDs =
+        new BooleanEvent(
+            loop, () -> controller.getRawButton(Controls.XboxController.updatePIDsButton));
 
     updatePIDs
         .rising()
@@ -105,9 +112,15 @@ public class RobotContainer {
               rightArm.setPID(PID);
               System.out.println("UPDATING PIDS");
             });
+
+    BooleanEvent clearCameraData =
+        new BooleanEvent(
+            loop, () -> controller.getRawButton(Controls.XboxController.clearCameraDataButton));
+
+    clearCameraData.rising().ifHigh(() -> velocityTracker.clearData());
   }
 
-  public void pollLoop() {
+  public void periodic() {
     loop.poll();
     leftLeg.run();
     rightLeg.run();
@@ -115,6 +128,7 @@ public class RobotContainer {
     rightArm.run();
     lights.run();
     updateShuffle();
+    velocityTracker.printData(camera1);
   }
 
   public void updateShuffle() {
@@ -122,11 +136,11 @@ public class RobotContainer {
 
     shuffle.setLayout("Left Leg", 1, 2);
     shuffle.setBoolean("Left Leg Up", leftLeg.isUp());
-    shuffle.setBoolean("Left Leg Locked", leftLeg.isLocked());
+    shuffle.setBoolean("Left Leg Locked", leftLeg.isEnabled());
 
     shuffle.setLayout("Right Leg", 1, 2);
     shuffle.setBoolean("Right Leg Up", rightLeg.isUp());
-    shuffle.setBoolean("Right Leg Locked", rightLeg.isLocked());
+    shuffle.setBoolean("Right Leg Locked", rightLeg.isEnabled());
 
     shuffle.setLayout("Left Arm", 1, 2);
     shuffle.setNumber("Left Arm Position", leftArm.getPosition());
