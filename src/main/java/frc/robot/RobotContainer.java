@@ -19,6 +19,7 @@ public class RobotContainer {
   public LegSubsystem rightLeg;
   public ArmSubsystem leftArm;
   public ArmSubsystem rightArm;
+  public LightsSubsystem lights;
 
   private EventLoop loop = new EventLoop();
   private ShuffleboardSubsystem shuffle = ShuffleboardSubsystem.getInstance();
@@ -44,6 +45,7 @@ public class RobotContainer {
             DeviceIDs.leftArmMotor,
             Arms.Positions.leftMaxPosition,
             Arms.Positions.leftMinPosition,
+            false,
             false);
 
     leftArm.setPID(Arms.LeftPID.P, Arms.LeftPID.I, Arms.LeftPID.D);
@@ -53,9 +55,12 @@ public class RobotContainer {
             DeviceIDs.rightArmMotor,
             Arms.Positions.rightMaxPosition,
             Arms.Positions.rightMinPosition,
-            true);
+            true,
+            false);
 
     rightArm.setPID(Arms.RightPID.P, Arms.RightPID.I, Arms.RightPID.D);
+
+    lights = new LightsSubsystem(4, 5);
 
     configureBindings();
   }
@@ -71,6 +76,11 @@ public class RobotContainer {
     BooleanEvent toggleRightLeg = new BooleanEvent(loop, () -> controller.getBButton());
 
     toggleRightLeg.rising().ifHigh(() -> rightLeg.togglePosition());
+
+    // Comment toggleRightArm if using joystick to control
+    BooleanEvent toggleRightArm = new BooleanEvent(loop, () -> controller.getBButton());
+
+    toggleRightArm.rising().ifHigh(() -> rightArm.toggleArmPosition());
 
     BooleanEvent toggleSafeMode = new BooleanEvent(loop, () -> controller.getYButton());
 
@@ -101,8 +111,9 @@ public class RobotContainer {
     loop.poll();
     leftLeg.run();
     rightLeg.run();
-    // leftArm.run();
+    leftArm.run();
     rightArm.run();
+    lights.run();
     updateShuffle();
   }
 
