@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import frc.robot.Constants.*;
 import frc.robot.Subsystems.*;
+import frc.robot.Subsystems.DualCameraVelocityTracker;
 import frc.robot.Subsystems.photonVisionCamera;
 
 public class RobotContainer {
@@ -26,6 +27,7 @@ public class RobotContainer {
   public photonVisionCamera camera1;
   public photonVisionCamera camera2;
   public CANSparkMax IRLight;
+  public LightsSubsystem lights;
 
   public int testMode = 0;
   private EventLoop loop = new EventLoop();
@@ -73,6 +75,8 @@ public class RobotContainer {
     camera1 = new photonVisionCamera("Arducam_OV9281_USB_Camera");
     camera2 = new photonVisionCamera("Arducam_OV9281_USB_Camera (1)");
     velocityTracker = new DualCameraVelocityTracker(camera1, -0.07, 0.04, camera2, -0.07, -0.05);
+
+    lights = new LightsSubsystem(5, 59);
 
     configureBindings();
   }
@@ -143,6 +147,7 @@ public class RobotContainer {
 
   public void enabledPeriodic() {
     loop.poll();
+    lights.run();
     // leftLeg.run();
     // rightLeg.run();
     // leftArm.run();
