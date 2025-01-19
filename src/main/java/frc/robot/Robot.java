@@ -37,8 +37,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    m_robotContainer.lights.setLEDColorWithBrightness(255, 255, 255, 0.1);
-     m_robotContainer.lights.rainbow();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

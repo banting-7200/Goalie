@@ -24,7 +24,6 @@ public class RobotContainer {
 
   public Camera camera1;
   public VelocityTracker velocityTracker;
-  public LightsSubsystem lights;
 
   private EventLoop loop = new EventLoop();
   private ShuffleboardSubsystem shuffle = ShuffleboardSubsystem.getInstance();
@@ -126,7 +125,6 @@ public class RobotContainer {
     rightLeg.run();
     leftArm.run();
     rightArm.run();
-    lights.run();
     updateShuffle();
     velocityTracker.printData(camera1);
   }
