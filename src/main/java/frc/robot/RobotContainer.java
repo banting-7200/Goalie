@@ -4,13 +4,14 @@
 
 package frc.robot;
 
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
-import frc.robot.Commands.VelocityTracker;
 import frc.robot.Constants.*;
 import frc.robot.Subsystems.*;
-import frc.robot.Subsystems.Camera;
+import frc.robot.Subsystems.photonVisionCamera;
 
 public class RobotContainer {
 
@@ -21,10 +22,12 @@ public class RobotContainer {
   public LegSubsystem rightLeg;
   public ArmSubsystem leftArm;
   public ArmSubsystem rightArm;
+  public DualCameraVelocityTracker velocityTracker;
+  public photonVisionCamera camera1;
+  public photonVisionCamera camera2;
+  public CANSparkMax IRLight;
 
-  public Camera camera1;
-  public VelocityTracker velocityTracker;
-
+  public int testMode = 0;
   private EventLoop loop = new EventLoop();
   private ShuffleboardSubsystem shuffle = ShuffleboardSubsystem.getInstance();
 
@@ -63,6 +66,13 @@ public class RobotContainer {
             false);
 
     rightArm.setPID(Arms.RightPID.P, Arms.RightPID.I, Arms.RightPID.D);
+
+    IRLight = new CANSparkMax(5, MotorType.kBrushed);
+    IRLight.setInverted(true);
+
+    camera1 = new photonVisionCamera("Arducam_OV9281_USB_Camera");
+    camera2 = new photonVisionCamera("Arducam_OV9281_USB_Camera (1)");
+    velocityTracker = new DualCameraVelocityTracker(camera1, -0.07, 0.04, camera2, -0.07, -0.05);
 
     configureBindings();
   }
@@ -112,21 +122,54 @@ public class RobotContainer {
               System.out.println("UPDATING PIDS");
             });
 
+    BooleanEvent switchTestMode =
+        new BooleanEvent(
+            loop, () -> controller.getRawButton(Controls.XboxController.switchTestModeButton));
+
+    switchTestMode.rising().ifHigh(() -> testMode++);
+
     BooleanEvent clearCameraData =
         new BooleanEvent(
             loop, () -> controller.getRawButton(Controls.XboxController.clearCameraDataButton));
 
-    clearCameraData.rising().ifHigh(() -> velocityTracker.clearData());
+    clearCameraData.rising().ifHigh(() -> velocityTracker.reset());
   }
 
   public void periodic() {
-    loop.poll();
-    leftLeg.run();
-    rightLeg.run();
-    leftArm.run();
-    rightArm.run();
     updateShuffle();
-    velocityTracker.printData(camera1);
+    updateTests();
+    IRLight.set(0.5);
+  }
+
+  public void enabledPeriodic() {
+    loop.poll();
+    // leftLeg.run();
+    // rightLeg.run();
+    // leftArm.run();
+    // rightArm.run();
+  }
+
+  public void updateTests() {
+    if (testMode != 0) System.out.print(String.valueOf(testMode) + "|");
+    switch (testMode) {
+      case 0:
+        break;
+      case 1:
+        camera1.test();
+        break;
+      case 2:
+        camera2.test();
+        break;
+      case 3:
+        velocityTracker.stationaryTest();
+        break;
+      case 4:
+        velocityTracker.trajectoryTest();
+        break;
+      default:
+        testMode = 0;
+        break;
+    }
   }
 
   public void updateShuffle() {
@@ -149,5 +192,39 @@ public class RobotContainer {
     shuffle.setNumber("Right Arm Position", rightArm.getPosition());
     shuffle.setBoolean("Right Arm Enabled", rightArm.isEnabled());
     shuffle.setNumber("Right Arm Current", rightArm.getCurrent());
+  }
+
+  // public void estimateSave() {
+  //   double secondsToImpact = velocityTracker.getSecondsToImpact();
+  //   double[] hitPoint = velocityTracker.getHitPoint();
+
+  //   if (hitPoint[0] > Constants.Robot.width / 2) {
+  //     System.out.print("right");
+  //   } else if (hitPoint[0] < -Constants.Robot.width / 2) {
+  //     System.out.print("left");
+  //   } else {
+  //     System.out.print("middle");
+  //   }
+
+  //   if (hitPoint[1] > Constants.Robot.height / 2) {
+  //     System.out.print(" top");
+  //   } else if (hitPoint[1] < -Constants.Robot.height / 2) {
+  //     System.out.print(" middle");
+  //   } else {
+  //     System.out.print(" bottom");
+  //   }
+  //   System.out.println(" in " + secondsToImpact + " seconds ");
+  // }
+
+  public void makeSave() {
+    double box =
+        1; // box where the puck is going, 1-6, 3 across, 2 down, starting at the top left from the
+    // perspective of the robot
+    // double secondsToImpact = velocityTracker.getSecondsToImpact();
+    // double[] hitPoint = velocityTracker.getHitPoint();
+
+    // if (hitPoint[0] > -Constants.Robot.width / 2) box++;
+    // if (hitPoint[0] > Constants.Robot.width / 2) box++;
+    // if (hitPoint[1] < 0) box += 3;
   }
 }
