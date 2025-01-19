@@ -1,7 +1,6 @@
-// package frc.robot.Commands;
+// package frc.robot.Subsystems;
 
 // import edu.wpi.first.wpilibj2.command.SubsystemBase;
-// import frc.robot.Subsystems.Camera;
 // import java.util.ArrayList;
 // import java.util.Arrays;
 
@@ -12,9 +11,7 @@
 //     dataList = new ArrayList<>();
 //   }
 
-//   // Subclasses //
 //   public class CameraData {
-//     // Data //
 //     private final double[] areas = new double[2];
 //     private final double[] distances = new double[2];
 //     private final double[] yaws = new double[2];
@@ -28,27 +25,20 @@
 //     private long currTime = System.currentTimeMillis();
 
 //     private final Camera camera;
-//     private final double nearArea;
-//     private final double farArea;
-//     private final double nearDistance;
-//     private final double farDistance;
+//     private final double referenceDistance;
+//     private final double referenceArea;
 //     private final double xOffset;
 //     private final double yOffset;
 
-//     // Constructor //
 //     public CameraData(
 //         Camera camera,
-//         double nearArea,
-//         double farArea,
-//         double nearDistance,
-//         double farDistance,
+//         double referenceArea,
+//         double referenceDistance,
 //         double xOffset,
 //         double yOffset) {
 //       this.camera = camera;
-//       this.nearArea = nearArea;
-//       this.farArea = farArea;
-//       this.nearDistance = nearDistance;
-//       this.farDistance = farDistance;
+//       this.referenceArea = referenceArea;
+//       this.referenceDistance = referenceDistance;
 //       this.xOffset = xOffset;
 //       this.yOffset = yOffset;
 //     }
@@ -77,58 +67,66 @@
 //     }
 
 //     private void addYaw(double yaw) {
-//       yaws[1] = yaws[0];
-//       yaws[0] = yaw;
+//       if (!Double.isNaN(yaw)) {
+//         yaws[1] = yaws[0];
+//         yaws[0] = yaw;
+//       }
 //     }
 
 //     private void addPitch(double pitch) {
-//       pitches[1] = pitches[0];
-//       pitches[0] = pitch;
+//       if (!Double.isNaN(pitch)) {
+//         pitches[1] = pitches[0];
+//         pitches[0] = pitch;
+//       }
 //     }
 
 //     private void addArea(double area) {
-//       areas[1] = areas[0];
-//       areas[0] = area;
+//       if (!Double.isNaN(area)) {
+//         areas[1] = areas[0];
+//         areas[0] = area;
+//       }
 //     }
 
 //     private void addSpeed(double speed) {
-//       speeds.add(speed);
+//       if(!Double.isNaN(speed))
+//         speeds.add(speed);
 //     }
 //   }
 
-//   // Base Methods //
 //   public void addCamera(
 //       Camera camera,
-//       double nearArea,
-//       double farArea,
-//       double nearDistance,
-//       double farDistance,
-//       double yOffset,
-//       double xOffset) {
-//     // Initialize Data //
+//       double referenceArea,
+//       double referenceDistance,
+//       double xOffset,
+//       double yOffset) {
 //     dataList.add(
-//         new CameraData(camera, nearArea, farArea, nearDistance, farDistance, yOffset, xOffset));
+//         new CameraData(camera, referenceArea, referenceDistance, xOffset, yOffset));
 //   }
 
 //   public CameraData getCameraData(Camera camera) {
 //     for (CameraData data : dataList) {
-//       // Conditions //
-//       if (data.camera != camera) continue;
-//       // Success //
+//       if (data.camera != camera)
+//         continue;
 //       return data;
 //     }
-//     // FAIL //
 //     return null;
 //   }
 
-//   // Action Methods //
-//   private double getRecentDistance(Camera camera) {
-//     CameraData cameraData = getCameraData(camera);
-//     double area = cameraData.areas[0];
-//     double nearArea = cameraData.nearArea;
-//     double farArea = cameraData.farArea;
-//     double nearDistance = cameraData.nearDistance;
-//     double farDistance = cameraData.farDistance;
+//   private double findLongestDiagonal(Camera camera) {
+//     double width = camera.getTargetWidth();
+//     double height = camera.getTargetHeight();
+//     double diagonal =
+//   }
+
+//   private double findDistance(Camera camera) {
+//     CameraData data = getCameraData(camera);
+//     double distanceEstimate = data.referenceArea/data.referenceDistance
+//   }
+
+//   private double getRecentDistance() {
+//     for (CameraData data : dataList) {
+//       double distance = data.areas[0];
+//     }
 
 //     double distanceEstimate = 1 / (area * 37.2742) + 0.839629;
 //     // (area - nearArea) / (farArea - nearArea) * (farDistance - nearDistance) + nearDistance;
@@ -147,6 +145,10 @@
 //     double speed = 1000 * (distance1 - distance2) / (data.currTime - data.prevTime);
 //     // Return //
 //     return speed;
+//   }
+
+//   private double getRecentSpeed(){
+
 //   }
 
 //   public double getRecentHorizontalAngle(Camera camera) {

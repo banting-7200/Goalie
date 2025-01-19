@@ -18,6 +18,11 @@ public final class Constants {
     public static final int port = 0;
   }
 
+  public final class Robot {
+    public static final double width = 2;
+    public static final double height = 2;
+  }
+
   public final class Legs {
     public class PID {
       public static final double P = 0.007;
@@ -87,6 +92,7 @@ public final class Constants {
       public static final int leftArmChannel = 1;
       public static final int rightArmChannel = 3;
       public static final int clearCameraDataButton = 5;
+      public static final int switchTestModeButton = 6;
     }
   }
 }

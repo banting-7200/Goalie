@@ -37,6 +37,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    m_robotContainer.periodic();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -76,7 +77,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     m_robotContainer.rightArm.moveFromRange(-1, 1, m_robotContainer.controller.getRightY());
     m_robotContainer.leftArm.moveFromRange(-1, 1, m_robotContainer.controller.getLeftY());
-    m_robotContainer.periodic();
+    m_robotContainer.enabledPeriodic();
   }
 
   @Override
