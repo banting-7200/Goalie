@@ -22,11 +22,20 @@ public class ArmSubsystem extends SubsystemBase {
   private double lowerStopRange = Arms.Positions.lowerStopRange;
 
   private boolean enabled = false;
+  private boolean useJoystickControl = false;
+  private boolean isArmUp = false;
+  private int PIDSlot = 0;
 
-  public ArmSubsystem(int deviceID, double upPosition, double downPosition, boolean isInverted) {
+  public ArmSubsystem(
+      int deviceID,
+      double upPosition,
+      double downPosition,
+      boolean isInverted,
+      boolean useJoystickControl) {
 
     this.upPosition = upPosition;
     this.downPosition = downPosition;
+    this.useJoystickControl = useJoystickControl;
     setPosition = downPosition;
     setPosition = downPosition;
 
@@ -70,6 +79,15 @@ public class ArmSubsystem extends SubsystemBase {
     }
   }
 
+  public void toggleArmPosition() {
+    isArmUp = !isArmUp;
+    if (isArmUp) {
+      moveToAngle(upPosition);
+    } else {
+      moveToAngle(downPosition);
+    }
+  }
+
   private boolean withinUpperLimits() {
     return (currentPosition < upPosition - upperStopRange);
   }
@@ -93,7 +111,7 @@ public class ArmSubsystem extends SubsystemBase {
         (input - rangeMin) / (rangeMax - rangeMin) * (upPosition - downPosition) + downPosition;
 
     moveToAngle(position);
-    // System.out.println(position);
+    System.out.println(position);
   }
 
   public void moveToAngle(double setPosition) {

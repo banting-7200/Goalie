@@ -52,6 +52,7 @@ public class RobotContainer {
             DeviceIDs.leftArmMotor,
             Arms.Positions.leftMaxPosition,
             Arms.Positions.leftMinPosition,
+            false,
             false);
 
     leftArm.setPID(Arms.LeftPID.P, Arms.LeftPID.I, Arms.LeftPID.D);
@@ -61,7 +62,8 @@ public class RobotContainer {
             DeviceIDs.rightArmMotor,
             Arms.Positions.rightMaxPosition,
             Arms.Positions.rightMinPosition,
-            true);
+            true,
+            false);
 
     rightArm.setPID(Arms.RightPID.P, Arms.RightPID.I, Arms.RightPID.D);
 
@@ -87,6 +89,11 @@ public class RobotContainer {
         new BooleanEvent(
             loop, () -> controller.getRawButton(Controls.XboxController.rightLegToggleButton));
     toggleRightLeg.rising().ifHigh(() -> rightLeg.togglePosition());
+
+    // Comment toggleRightArm if using joystick to control
+    BooleanEvent toggleRightArm = new BooleanEvent(loop, () -> controller.getBButton());
+
+    toggleRightArm.rising().ifHigh(() -> rightArm.toggleArmPosition());
 
     BooleanEvent toggleSafeMode =
         new BooleanEvent(loop, () -> controller.getRawButton(Controls.XboxController.enableButton));

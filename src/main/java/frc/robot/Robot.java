@@ -75,7 +75,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    m_robotContainer.rightArm.moveFromRange(-1, 1, m_robotContainer.controller.getRightY());
+    //   m_robotContainer.rightArm.moveFromRange(-1, 1, m_robotContainer.controller.getRightY());
     m_robotContainer.leftArm.moveFromRange(-1, 1, m_robotContainer.controller.getLeftY());
     m_robotContainer.enabledPeriodic();
   }
