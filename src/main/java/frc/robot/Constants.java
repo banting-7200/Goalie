@@ -81,6 +81,7 @@ public final class Constants {
     public static final int rightLegMotor = 2;
     public static final int leftArmMotor = 4;
     public static final int rightArmMotor = 3;
+    public static final int headMotor = 5;
   }
 
   public final class Controls {
@@ -93,6 +94,19 @@ public final class Constants {
       public static final int rightArmChannel = 3;
       public static final int clearCameraDataButton = 5;
       public static final int switchTestModeButton = 6;
+    }
+  }
+
+  public final class Head{
+    public class PID {
+      public static final double P = 0;
+      public static final double I = 0;
+      public static final double D = 0;
+    }
+    
+    public class Positions {
+      public static final double maxPosition = 0;
+      public static final double minPosition = 0;
     }
   }
 }

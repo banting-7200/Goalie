@@ -28,6 +28,7 @@ public class RobotContainer {
   public photonVisionCamera camera2;
   public CANSparkMax IRLight;
   public LightsSubsystem lights;
+  public HeadSubsystem head;
 
   public int testMode = 0;
   private EventLoop loop = new EventLoop();
@@ -78,6 +79,8 @@ public class RobotContainer {
 
     lights = new LightsSubsystem(5, 59);
 
+    head = new HeadSubsystem(2,1,2);
+
     configureBindings();
   }
 
@@ -92,7 +95,7 @@ public class RobotContainer {
     BooleanEvent toggleRightLeg =
         new BooleanEvent(
             loop, () -> controller.getRawButton(Controls.XboxController.rightLegToggleButton));
-    toggleRightLeg.rising().ifHigh(() -> rightLeg.togglePosition());
+    toggleRightLeg.rising().ifHigh(() -> head.toggleHead());
 
     // Comment toggleRightArm if using joystick to control
     BooleanEvent toggleRightArm = new BooleanEvent(loop, () -> controller.getBButton());
@@ -148,6 +151,7 @@ public class RobotContainer {
   public void enabledPeriodic() {
     loop.poll();
     lights.run();
+    head.run();
     // leftLeg.run();
     // rightLeg.run();
     // leftArm.run();
