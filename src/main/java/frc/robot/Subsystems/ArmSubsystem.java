@@ -111,7 +111,7 @@ public class ArmSubsystem extends SubsystemBase {
         (input - rangeMin) / (rangeMax - rangeMin) * (upPosition - downPosition) + downPosition;
 
     moveToAngle(position);
-    System.out.println(position);
+    // System.out.println(position);
   }
 
   public void moveToAngle(double setPosition) {

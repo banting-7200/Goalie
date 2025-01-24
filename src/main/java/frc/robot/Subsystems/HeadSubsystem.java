@@ -2,9 +2,8 @@ package frc.robot.Subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import frc.robot.Constants.Head;
 import edu.wpi.first.wpilibj.DigitalInput;
-
+import frc.robot.Constants.Head;
 
 public class HeadSubsystem {
 
@@ -69,6 +68,5 @@ public class HeadSubsystem {
     } else {
       headMotor.set(ControlMode.PercentOutput, 0);
     }
-
   }
 }

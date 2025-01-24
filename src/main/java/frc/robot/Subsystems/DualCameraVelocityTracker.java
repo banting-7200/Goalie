@@ -19,10 +19,6 @@ public class DualCameraVelocityTracker extends SubsystemBase {
   private ArrayList<double[]> positions = new ArrayList<>();
   private ArrayList<double[]> velocities = new ArrayList<>();
 
-  // private ArrayList<Double> horizontalVelocities = new ArrayList<>();
-  // private ArrayList<Double> verticalVelocities = new ArrayList<>();
-  // private ArrayList<Double> incomingVelocities = new ArrayList<>();
-
   /**
    * Initializes a dual camera velocity tracker object.
    *
@@ -58,26 +54,44 @@ public class DualCameraVelocityTracker extends SubsystemBase {
 
   public double getDistance() {
     double horizontalGap = Math.abs(c1xOffset - c2xOffset);
-    double yaw1 = c1.getTargetYaw();
-    double yaw2 = c2.getTargetYaw();
+
+    double yaw1 = Math.toRadians(Math.abs(90 - c2.getTargetYaw()));
+    double yaw2 = Math.toRadians(Math.abs(90 + c1.getTargetYaw()));
+    double oppAngle = Math.PI - yaw1 - yaw2;
+
+    double side1 = Math.sin(yaw2) * horizontalGap / Math.sin(oppAngle);
+    double side2 = Math.sin(yaw1) * horizontalGap / Math.sin(oppAngle);
+
+    double semiPerimeter = (side1 + side2 + horizontalGap) / 2;
+
+    double area =
+        Math.sqrt(
+            semiPerimeter
+                * (semiPerimeter - horizontalGap)
+                * (semiPerimeter - side1)
+                * (semiPerimeter - side2));
+
+    double hDistanceEstimate = area * 2 / horizontalGap;
 
     double verticalGap = Math.abs(c1yOffset - c2yOffset);
-    double pitch1 = c1.getTargetPitch();
-    double pitch2 = c2.getTargetPitch();
 
-    double hDistanceEstimate =
-        // (horizontalGap * Math.sin(Math.toRadians(90 - yaw1)) *
-        // Math.sin(Math.toRadians(90 +
-        // yaw2)))
-        // / Math.sin(yaw1 - yaw2);
-        (Math.sin(yaw1 - yaw2) * Math.sin(90 - yaw1)) / (horizontalGap * Math.sin(90 + yaw2));
-    double vDistanceEstimate =
-        // (verticalGap
-        // * Math.sin(Math.toRadians(90 + pitch1))
-        // * Math.sin(Math.toRadians(90 - pitch2)))
-        // / Math.sin(pitch2 - pitch1);
-        (Math.sin(pitch2 - pitch1) * Math.sin(90 + pitch1)) / (verticalGap * Math.sin(90 - pitch2));
+    double pitch1 = Math.toRadians(Math.abs(90 + c1.getTargetYaw()));
+    double pitch2 = Math.toRadians(Math.abs(90 - c2.getTargetYaw()));
+    double oppPitch = Math.PI - pitch1 - pitch2;
 
+    double pSide1 = Math.sin(pitch2) * verticalGap / Math.sin(oppPitch);
+    double pSide2 = Math.sin(pitch1) * verticalGap / Math.sin(oppPitch);
+
+    double pSemiPerimeter = (pSide1 + pSide2 + verticalGap) / 2;
+
+    double pArea =
+        Math.sqrt(
+            pSemiPerimeter
+                * (pSemiPerimeter - verticalGap)
+                * (pSemiPerimeter - pSide1)
+                * (pSemiPerimeter - pSide2));
+
+    double vDistanceEstimate = pArea * 2 / verticalGap;
     return (hDistanceEstimate + vDistanceEstimate) / 2;
   }
 
@@ -86,7 +100,7 @@ public class DualCameraVelocityTracker extends SubsystemBase {
   }
 
   public double getTargetYPosition() {
-    return getDistance() / Math.tan(Math.toRadians(90 + c1.getTargetPitch()));
+    return getDistance() / Math.tan(Math.toRadians(90 - c1.getTargetPitch()));
   }
 
   public void addPosition(double x, double y, double z) {
@@ -102,15 +116,15 @@ public class DualCameraVelocityTracker extends SubsystemBase {
     if (positions.size() < 2) return null;
     double position1 = positions.get(positions.size() - 2)[0];
     double position2 = positions.get(positions.size() - 1)[0];
-    double velocity = position2 - position1 * frameRate;
+    double velocity = (position2 - position1) * frameRate;
     return velocity;
   }
 
-  public Double getRecentVerticalVelocities() {
+  public Double getRecentVerticalVelocity() {
     if (positions.size() < 2) return null;
     double position1 = positions.get(positions.size() - 2)[1];
     double position2 = positions.get(positions.size() - 1)[1];
-    double velocity = position2 - position1 * frameRate;
+    double velocity = (position2 - position1) * frameRate;
     return velocity;
   }
 
@@ -118,14 +132,14 @@ public class DualCameraVelocityTracker extends SubsystemBase {
     if (positions.size() < 2) return null;
     double position1 = positions.get(positions.size() - 2)[2];
     double position2 = positions.get(positions.size() - 1)[2];
-    double velocity = position2 - position1 * frameRate;
+    double velocity = (position1 - position2) * frameRate;
     return velocity;
   }
 
   public void addRecentVelocity() {
     if (positions.size() < 2) return;
     double[] velocity = {
-      getRecentHorizontalVelocity(), getRecentVerticalVelocities(), getRecentIncomingVelocity()
+      getRecentHorizontalVelocity(), getRecentVerticalVelocity(), getRecentIncomingVelocity()
     };
     velocities.add(velocity);
   }
@@ -173,13 +187,14 @@ public class DualCameraVelocityTracker extends SubsystemBase {
    * motion. - distance in metres - position right in metres - position up in metres
    */
   public void stationaryTest() {
+    if (!c1.hasTarget() || !c2.hasTarget()) return;
     System.out.println(
         "Distance:"
-            + getDistance()
+            + String.format("%.2f", getDistance())
             + " Right:"
-            + getTargetXPosition()
+            + String.format("%.2f", getTargetXPosition())
             + " Up:"
-            + getTargetYPosition());
+            + String.format("%.2f", getTargetYPosition()));
   }
 
   /**
@@ -188,13 +203,14 @@ public class DualCameraVelocityTracker extends SubsystemBase {
    * velocity in metres per second
    */
   public void trajectoryTest() {
+    if (!c1.hasTarget() || !c2.hasTarget()) return;
     System.out.println(
         "Incoming:"
-            + getDistance()
-            + " Right:"
-            + getTargetXPosition()
-            + " Up:"
-            + getTargetYPosition());
+            + String.format("%.2f", getAverageIncomingVelocity())
+            + " Horizontal:"
+            + String.format("%.2f", getAverageHorizontalVelocity())
+            + " Vertical:"
+            + String.format("%.2f", getAverageVerticalVelocity()));
   }
 
   public void reset() {

@@ -97,13 +97,13 @@ public final class Constants {
     }
   }
 
-  public final class Head{
+  public final class Head {
     public class PID {
       public static final double P = 0;
       public static final double I = 0;
       public static final double D = 0;
     }
-    
+
     public class Positions {
       public static final double maxPosition = 0;
       public static final double minPosition = 0;
