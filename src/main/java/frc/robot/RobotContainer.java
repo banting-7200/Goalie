@@ -75,11 +75,11 @@ public class RobotContainer {
 
     camera1 = new photonVisionCamera("Arducam_OV9281_USB_Camera");
     camera2 = new photonVisionCamera("Arducam_OV9281_USB_Camera (1)");
-    velocityTracker = new DualCameraVelocityTracker(camera1, 0.07, 0.04, camera2, -0.07, -0.05);
+    velocityTracker = new DualCameraVelocityTracker(camera1, -0.07, 0.04, camera2, -0.07, -0.05);
 
     lights = new LightsSubsystem(5, 59);
 
-    head = new HeadSubsystem(2, 1, 2);
+    head = new HeadSubsystem(10, 1, 2);
 
     configureBindings();
   }
@@ -95,7 +95,17 @@ public class RobotContainer {
     BooleanEvent toggleRightLeg =
         new BooleanEvent(
             loop, () -> controller.getRawButton(Controls.XboxController.rightLegToggleButton));
-    toggleRightLeg.rising().ifHigh(() -> rightLeg.togglePosition());
+    toggleRightLeg.rising().ifHigh(() -> head.toggleHead());
+
+    BooleanEvent toggleHead =
+        new BooleanEvent(
+            loop, () -> controller.getRawButton(Controls.XboxController.toggleHeadButton));
+    toggleHead.rising().ifHigh(() -> head.toggleHead());
+
+    BooleanEvent zeroHead =
+        new BooleanEvent(
+            loop, () -> controller.getRawButton(Controls.XboxController.zeroHeadButton));
+    zeroHead.rising().ifHigh(() -> head.zeroEncoder());
 
     // Comment toggleRightArm if using joystick to control
     BooleanEvent toggleRightArm = new BooleanEvent(loop, () -> controller.getBButton());
@@ -113,6 +123,7 @@ public class RobotContainer {
               leftLeg.setEnabled(!leftLeg.isEnabled());
               rightArm.setEnabled(!rightArm.isEnabled());
               leftArm.setEnabled(!leftArm.isEnabled());
+              head.enableMovement(!head.isEnabled());
             });
 
     BooleanEvent updatePIDs =
@@ -139,7 +150,7 @@ public class RobotContainer {
         new BooleanEvent(
             loop, () -> controller.getRawButton(Controls.XboxController.clearCameraDataButton));
 
-    clearCameraData.ifHigh(() -> velocityTracker.reset());
+    clearCameraData.rising().ifHigh(() -> velocityTracker.reset());
   }
 
   public void periodic() {
@@ -203,25 +214,37 @@ public class RobotContainer {
     shuffle.setNumber("Right Arm Current", rightArm.getCurrent());
   }
 
-  public void estimateSave() {
-    double secondsToImpact = velocityTracker.getSecondsToImpact();
-    double[] hitPoint = velocityTracker.getHitPoint();
+  // public void estimateSave() {
+  //   double secondsToImpact = velocityTracker.getSecondsToImpact();
+  //   double[] hitPoint = velocityTracker.getHitPoint();
 
-    if (hitPoint[0] > Constants.Robot.width / 2) {
-      System.out.print("right");
-    } else if (hitPoint[0] < -Constants.Robot.width / 2) {
-      System.out.print("left");
-    } else {
-      System.out.print("middle");
-    }
+  //   if (hitPoint[0] > Constants.Robot.width / 2) {
+  //     System.out.print("right");
+  //   } else if (hitPoint[0] < -Constants.Robot.width / 2) {
+  //     System.out.print("left");
+  //   } else {
+  //     System.out.print("middle");
+  //   }
 
-    if (hitPoint[1] > Constants.Robot.height / 2) {
-      System.out.print(" top");
-    } else if (hitPoint[1] < -Constants.Robot.height / 2) {
-      System.out.print(" middle");
-    } else {
-      System.out.print(" bottom");
-    }
-    System.out.println(" in " + secondsToImpact + " seconds ");
+  //   if (hitPoint[1] > Constants.Robot.height / 2) {
+  //     System.out.print(" top");
+  //   } else if (hitPoint[1] < -Constants.Robot.height / 2) {
+  //     System.out.print(" middle");
+  //   } else {
+  //     System.out.print(" bottom");
+  //   }
+  //   System.out.println(" in " + secondsToImpact + " seconds ");
+  // }
+
+  public void makeSave() {
+    double box =
+        1; // box where the puck is going, 1-6, 3 across, 2 down, starting at the top left from the
+    // perspective of the robot
+    // double secondsToImpact = velocityTracker.getSecondsToImpact();
+    // double[] hitPoint = velocityTracker.getHitPoint();
+
+    // if (hitPoint[0] > -Constants.Robot.width / 2) box++;
+    // if (hitPoint[0] > Constants.Robot.width / 2) box++;
+    // if (hitPoint[1] < 0) box += 3;
   }
 }
