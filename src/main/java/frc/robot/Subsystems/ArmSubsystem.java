@@ -22,21 +22,12 @@ public class ArmSubsystem extends SubsystemBase {
   private double lowerStopRange = Arms.Positions.lowerStopRange;
 
   private boolean enabled = false;
-  private boolean useJoystickControl = false;
   private boolean isArmUp = false;
-  private int PIDSlot = 0;
 
-  public ArmSubsystem(
-      int deviceID,
-      double upPosition,
-      double downPosition,
-      boolean isInverted,
-      boolean useJoystickControl) {
+  public ArmSubsystem(int deviceID, double upPosition, double downPosition, boolean isInverted) {
 
     this.upPosition = upPosition;
     this.downPosition = downPosition;
-    this.useJoystickControl = useJoystickControl;
-    setPosition = downPosition;
     setPosition = downPosition;
 
     motor = new CANSparkMax(deviceID, MotorType.kBrushless);
@@ -111,7 +102,6 @@ public class ArmSubsystem extends SubsystemBase {
         (input - rangeMin) / (rangeMax - rangeMin) * (upPosition - downPosition) + downPosition;
 
     moveToAngle(position);
-    // System.out.println(position);
   }
 
   public void moveToAngle(double setPosition) {
@@ -140,5 +130,13 @@ public class ArmSubsystem extends SubsystemBase {
 
   public double getCurrent() {
     return motor.getOutputCurrent();
+  }
+
+  public void moveToUpPosition() {
+    moveToAngle(upPosition);
+  }
+
+  public void moveToDownPosition() {
+    moveToAngle(setPosition);
   }
 }

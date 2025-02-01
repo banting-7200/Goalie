@@ -1,4 +1,4 @@
-package frc.robot.Subsystems;
+package frc.robot.Vision;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.ArrayList;
@@ -15,6 +15,7 @@ public class DualCameraVelocityTracker extends SubsystemBase {
   private final double c2yOffset;
 
   private final double frameRate = 144;
+  private final double minFrames = 20; // minimum frames needed to determine average velocities
 
   private ArrayList<double[]> positions = new ArrayList<>();
   private ArrayList<double[]> velocities = new ArrayList<>();
@@ -22,10 +23,10 @@ public class DualCameraVelocityTracker extends SubsystemBase {
   /**
    * Initializes a dual camera velocity tracker object.
    *
-   * @param camera1 the highest, leftmost camera
+   * @param camera1 the upper camera
    * @param camera1xOffset the x offset of this camera from the centre of the robot in metres
    * @param camera1yOffset the y offset of this camera from the centre of the robot in metres
-   * @param camera2 the lowest, rightmost camera
+   * @param camera2 the lower camera
    * @param camera2xOffset the x offset of this camera from the centre of the robot in metres
    * @param camera2yOffset the y offset of this camera from the centre of the robot in metres
    */
@@ -53,26 +54,6 @@ public class DualCameraVelocityTracker extends SubsystemBase {
   }
 
   public double getDistance() {
-    double horizontalGap = Math.abs(c1xOffset - c2xOffset);
-
-    double yaw1 = Math.toRadians(Math.abs(90 - c2.getTargetYaw()));
-    double yaw2 = Math.toRadians(Math.abs(90 + c1.getTargetYaw()));
-    double oppAngle = Math.PI - yaw1 - yaw2;
-
-    double side1 = Math.sin(yaw2) * horizontalGap / Math.sin(oppAngle);
-    double side2 = Math.sin(yaw1) * horizontalGap / Math.sin(oppAngle);
-
-    double semiPerimeter = (side1 + side2 + horizontalGap) / 2;
-
-    double area =
-        Math.sqrt(
-            semiPerimeter
-                * (semiPerimeter - horizontalGap)
-                * (semiPerimeter - side1)
-                * (semiPerimeter - side2));
-
-    double hDistanceEstimate = area * 2 / horizontalGap;
-
     double verticalGap = Math.abs(c1yOffset - c2yOffset);
 
     double pitch1 = Math.toRadians(Math.abs(90 + c1.getTargetYaw()));
@@ -92,15 +73,16 @@ public class DualCameraVelocityTracker extends SubsystemBase {
                 * (pSemiPerimeter - pSide2));
 
     double vDistanceEstimate = pArea * 2 / verticalGap;
-    return (hDistanceEstimate + vDistanceEstimate) / 2;
+
+    return vDistanceEstimate;
   }
 
   public double getTargetXPosition() {
-    return getDistance() / Math.tan(Math.toRadians(90 - c1.getTargetYaw()));
+    return (getDistance() / Math.tan(Math.toRadians(90 - c1.getTargetYaw()))) + c1xOffset;
   }
 
   public double getTargetYPosition() {
-    return getDistance() / Math.tan(Math.toRadians(90 - c1.getTargetPitch()));
+    return (getDistance() / Math.tan(Math.toRadians(90 - c1.getTargetPitch()))) + c1yOffset;
   }
 
   public void addPosition(double x, double y, double z) {
@@ -171,14 +153,46 @@ public class DualCameraVelocityTracker extends SubsystemBase {
     return avgVelocity;
   }
 
+  public double getRecentAverageHorizontalVelocity() {
+    double avgVelocity = 0;
+    if (velocities.size() < minFrames) return 0;
+    for (int i = 0; i < minFrames; i++) {
+      avgVelocity += velocities.get(velocities.size() - i)[0];
+    }
+    avgVelocity /= minFrames;
+    return avgVelocity;
+  }
+
+  public double getRecentAverageVerticalVelocity() {
+    double avgVelocity = 0;
+    if (velocities.size() < minFrames) return 0;
+    for (int i = 0; i < minFrames; i++) {
+      avgVelocity += velocities.get(velocities.size() - i)[1];
+    }
+    avgVelocity /= minFrames;
+    return avgVelocity;
+  }
+
+  public double getRecentAverageIncomingVelocity() {
+    double avgVelocity = 0;
+    if (velocities.size() < minFrames) return 0;
+    for (int i = 0; i < minFrames; i++) {
+      avgVelocity += velocities.get(velocities.size() - i)[2];
+    }
+    avgVelocity /= minFrames;
+    return avgVelocity;
+  }
+
   public double getSecondsToImpact() {
-    return getDistance() / getAverageIncomingVelocity();
+    return getDistance() / getRecentAverageIncomingVelocity();
   }
 
   public double[] getHitPoint() {
     double secondsToImpact = getSecondsToImpact();
-    double xPosition = getTargetXPosition() + getAverageHorizontalVelocity() * secondsToImpact;
-    double yPosition = getTargetYPosition() + getAverageVerticalVelocity() * secondsToImpact;
+    double xPosition =
+        getTargetXPosition() + (getRecentAverageHorizontalVelocity() * secondsToImpact);
+    double yPosition =
+        getTargetYPosition() + (getRecentAverageVerticalVelocity() * secondsToImpact);
     return new double[] {xPosition, yPosition};
   }
 
@@ -198,19 +212,19 @@ public class DualCameraVelocityTracker extends SubsystemBase {
   }
 
   /**
-   * Prints test data about the velocity and trajectory of the target since the previous reset. -
-   * incoming velocity in metres per second - rightward velocity in metres per second - upward
-   * velocity in metres per second
+   * Prints test data about the velocity and trajectory of the target in last 20 frames. - incoming
+   * velocity in metres per second - rightward velocity in metres per second - upward velocity in
+   * metres per second
    */
   public void trajectoryTest() {
     if (!c1.hasTarget() || !c2.hasTarget()) return;
     System.out.println(
         "Incoming:"
-            + String.format("%.2f", getAverageIncomingVelocity())
+            + String.format("%.2f", getRecentAverageIncomingVelocity())
             + " Horizontal:"
-            + String.format("%.2f", getAverageHorizontalVelocity())
+            + String.format("%.2f", getRecentAverageHorizontalVelocity())
             + " Vertical:"
-            + String.format("%.2f", getAverageVerticalVelocity()));
+            + String.format("%.2f", getRecentAverageVerticalVelocity()));
   }
 
   public void reset() {

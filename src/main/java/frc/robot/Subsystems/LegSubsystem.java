@@ -53,17 +53,25 @@ public class LegSubsystem extends SubsystemBase {
   public void togglePosition() {
     isUp = !isUp;
     if (isUp) {
-      setPositionsetPosition(upPosition);
+      setPosition(upPosition);
     } else {
-      setPositionsetPosition(downPosition);
+      setPosition(downPosition);
     }
+  }
+
+  public void moveToUpPosition() {
+    setPosition(upPosition);
+  }
+
+  public void moveToDownPosition() {
+    setPosition(downPosition);
   }
 
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
   }
 
-  public void setPositionsetPosition(double setPosition) {
+  public void setPosition(double setPosition) {
     this.setPosition = setPosition;
   }
 

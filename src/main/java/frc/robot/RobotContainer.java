@@ -4,35 +4,53 @@
 
 package frc.robot;
 
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.*;
+import frc.robot.Constants.Vision.lowerCamera;
+import frc.robot.Constants.Vision.upperCamera;
 import frc.robot.Subsystems.*;
-import frc.robot.Subsystems.DualCameraVelocityTracker;
-import frc.robot.Subsystems.photonVisionCamera;
+import frc.robot.Vision.*;
+import java.io.File;
 
 public class RobotContainer {
 
-  XboxController controller = new XboxController(Constants.Controller.port);
+  XboxController controller = new XboxController(Constants.Control.Main.port);
 
-  // Physical Components //
   public LegSubsystem leftLeg;
   public LegSubsystem rightLeg;
+
   public ArmSubsystem leftArm;
   public ArmSubsystem rightArm;
-  public DualCameraVelocityTracker velocityTracker;
-  public photonVisionCamera camera1;
-  public photonVisionCamera camera2;
-  public CANSparkMax IRLight;
-  public LightsSubsystem lights;
+
   public HeadSubsystem head;
 
-  public int testMode = 0;
-  private EventLoop loop = new EventLoop();
+  public photonVisionCamera camera1;
+  public photonVisionCamera camera2;
+
+  public SwerveSubsystem drivebase;
+
+  public DualCameraVelocityTracker velocityTracker;
+
+  private int testMode = 0;
+
+  private boolean canMakeSave = false;
+
+  private EventLoop testLoop = new EventLoop();
+  private EventLoop teleopLoop = new EventLoop();
+
   private ShuffleboardSubsystem shuffle = ShuffleboardSubsystem.getInstance();
+
+  Command driveFieldOrientedDirectAngle =
+      drivebase.driveCommand(
+          () -> MathUtil.applyDeadband(-controller.getLeftY(), 0.1),
+          () -> MathUtil.applyDeadband(-controller.getLeftX(), 0.1),
+          () -> -controller.getRightX(),
+          () -> -controller.getRightY());
 
   public RobotContainer() {
     shuffle.setTab("Status");
@@ -55,7 +73,6 @@ public class RobotContainer {
             DeviceIDs.leftArmMotor,
             Arms.Positions.leftMaxPosition,
             Arms.Positions.leftMinPosition,
-            false,
             false);
 
     leftArm.setPID(Arms.LeftPID.P, Arms.LeftPID.I, Arms.LeftPID.D);
@@ -65,21 +82,31 @@ public class RobotContainer {
             DeviceIDs.rightArmMotor,
             Arms.Positions.rightMaxPosition,
             Arms.Positions.rightMinPosition,
-            true,
-            false);
+            true);
 
     rightArm.setPID(Arms.RightPID.P, Arms.RightPID.I, Arms.RightPID.D);
 
-    IRLight = new CANSparkMax(5, MotorType.kBrushed);
-    IRLight.setInverted(true);
+    camera1 = new photonVisionCamera(Constants.Vision.upperCamera.address);
+    camera2 = new photonVisionCamera(Constants.Vision.lowerCamera.address);
 
-    camera1 = new photonVisionCamera("Arducam_OV9281_USB_Camera");
-    camera2 = new photonVisionCamera("Arducam_OV9281_USB_Camera (1)");
-    velocityTracker = new DualCameraVelocityTracker(camera1, -0.07, 0.04, camera2, -0.07, -0.05);
+    velocityTracker =
+        new DualCameraVelocityTracker(
+            camera1,
+            upperCamera.xOffset,
+            upperCamera.yOffset,
+            camera2,
+            lowerCamera.xOffset,
+            lowerCamera.yOffset);
 
-    lights = new LightsSubsystem(5, 59);
+    drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo"));
 
-    head = new HeadSubsystem(10, 1, 2);
+    head =
+        new HeadSubsystem(
+            Constants.DeviceIDs.headMotor,
+            Constants.DeviceIDs.headLowerLimit,
+            Constants.DeviceIDs.headUpperLimit);
+
+    // lights = new LightsSubsystem(5, 59);
 
     configureBindings();
   }
@@ -88,32 +115,29 @@ public class RobotContainer {
     shuffle.setPID("PID Tuner", Arms.RightPID.P, Arms.RightPID.I, Arms.RightPID.D);
 
     BooleanEvent toggleLeftLeg =
-        new BooleanEvent(
-            loop, () -> controller.getRawButton(Controls.XboxController.leftLegToggleButton));
+        new BooleanEvent(testLoop, () -> controller.getRawButton(Control.Main.leftLegToggleButton));
     toggleLeftLeg.rising().ifHigh(() -> leftLeg.togglePosition());
 
     BooleanEvent toggleRightLeg =
         new BooleanEvent(
-            loop, () -> controller.getRawButton(Controls.XboxController.rightLegToggleButton));
+            testLoop, () -> controller.getRawButton(Control.Main.rightLegToggleButton));
     toggleRightLeg.rising().ifHigh(() -> head.toggleHead());
 
     BooleanEvent toggleHead =
-        new BooleanEvent(
-            loop, () -> controller.getRawButton(Controls.XboxController.toggleHeadButton));
+        new BooleanEvent(testLoop, () -> controller.getRawButton(Control.Main.toggleHeadButton));
     toggleHead.rising().ifHigh(() -> head.toggleHead());
 
     BooleanEvent zeroHead =
-        new BooleanEvent(
-            loop, () -> controller.getRawButton(Controls.XboxController.zeroHeadButton));
+        new BooleanEvent(testLoop, () -> controller.getRawButton(Control.Main.zeroHeadButton));
     zeroHead.rising().ifHigh(() -> head.zeroEncoder());
 
     // Comment toggleRightArm if using joystick to control
-    BooleanEvent toggleRightArm = new BooleanEvent(loop, () -> controller.getBButton());
+    BooleanEvent toggleRightArm = new BooleanEvent(testLoop, () -> controller.getBButton());
 
     toggleRightArm.rising().ifHigh(() -> rightArm.toggleArmPosition());
 
     BooleanEvent toggleSafeMode =
-        new BooleanEvent(loop, () -> controller.getRawButton(Controls.XboxController.enableButton));
+        new BooleanEvent(testLoop, () -> controller.getRawButton(Control.Main.enableButton));
 
     toggleSafeMode
         .rising()
@@ -127,8 +151,7 @@ public class RobotContainer {
             });
 
     BooleanEvent updatePIDs =
-        new BooleanEvent(
-            loop, () -> controller.getRawButton(Controls.XboxController.updatePIDsButton));
+        new BooleanEvent(testLoop, () -> controller.getRawButton(Control.Main.updatePIDsButton));
 
     updatePIDs
         .rising()
@@ -142,31 +165,50 @@ public class RobotContainer {
 
     BooleanEvent switchTestMode =
         new BooleanEvent(
-            loop, () -> controller.getRawButton(Controls.XboxController.switchTestModeButton));
+            testLoop, () -> controller.getRawButton(Control.Main.switchTestModeButton));
 
     switchTestMode.rising().ifHigh(() -> testMode++);
 
     BooleanEvent clearCameraData =
         new BooleanEvent(
-            loop, () -> controller.getRawButton(Controls.XboxController.clearCameraDataButton));
+            testLoop, () -> controller.getRawButton(Control.Main.clearCameraDataButton));
 
     clearCameraData.rising().ifHigh(() -> velocityTracker.reset());
+
+    BooleanEvent zeroGyro = new BooleanEvent(testLoop, () -> controller.getAButton());
+
+    BooleanEvent resetBot =
+        new BooleanEvent(
+            teleopLoop, () -> controller.getRawButton(Control.Main.clearCameraDataButton));
+    resetBot.rising().ifHigh(() -> reset());
+
+    zeroGyro.rising().ifHigh(() -> drivebase.zeroGyro());
+    drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
   }
 
   public void periodic() {
     updateShuffle();
     updateTests();
-    IRLight.set(0.5);
   }
 
   public void enabledPeriodic() {
-    loop.poll();
-    lights.run();
+    // lights.run();
     head.run();
-    // leftLeg.run();
-    // rightLeg.run();
-    // leftArm.run();
-    // rightArm.run();
+    leftLeg.run();
+    rightLeg.run();
+    leftArm.run();
+    rightArm.run();
+  }
+
+  public void testPeriodic() {
+    leftArm.moveFromRange(-1, 1, controller.getLeftY());
+    rightArm.moveFromRange(-1, 1, controller.getLeftY());
+    testLoop.poll();
+  }
+
+  public void teleopPeriodic() {
+    teleopLoop.poll();
+    makeSave();
   }
 
   public void updateTests() {
@@ -186,6 +228,8 @@ public class RobotContainer {
       case 4:
         velocityTracker.trajectoryTest();
         break;
+      case 5:
+        estimateSave();
       default:
         testMode = 0;
         break;
@@ -214,37 +258,64 @@ public class RobotContainer {
     shuffle.setNumber("Right Arm Current", rightArm.getCurrent());
   }
 
-  // public void estimateSave() {
-  //   double secondsToImpact = velocityTracker.getSecondsToImpact();
-  //   double[] hitPoint = velocityTracker.getHitPoint();
+  public void estimateSave() {
+    double secondsToImpact = velocityTracker.getSecondsToImpact();
+    double[] hitPoint = velocityTracker.getHitPoint();
 
-  //   if (hitPoint[0] > Constants.Robot.width / 2) {
-  //     System.out.print("right");
-  //   } else if (hitPoint[0] < -Constants.Robot.width / 2) {
-  //     System.out.print("left");
-  //   } else {
-  //     System.out.print("middle");
-  //   }
+    if (hitPoint[0] > Constants.Robot.width / 2) {
+      System.out.print("right");
+    } else if (hitPoint[0] < -Constants.Robot.width / 2) {
+      System.out.print("left");
+    } else {
+      System.out.print("middle");
+    }
 
-  //   if (hitPoint[1] > Constants.Robot.height / 2) {
-  //     System.out.print(" top");
-  //   } else if (hitPoint[1] < -Constants.Robot.height / 2) {
-  //     System.out.print(" middle");
-  //   } else {
-  //     System.out.print(" bottom");
-  //   }
-  //   System.out.println(" in " + secondsToImpact + " seconds ");
-  // }
+    if (hitPoint[1] > Constants.Robot.height / 2) {
+      System.out.print(" top");
+    } else if (hitPoint[1] < -Constants.Robot.height / 2) {
+      System.out.print(" middle");
+    } else {
+      System.out.print(" bottom");
+    }
+    System.out.println(" in " + secondsToImpact + " seconds ");
+  }
+
+  public void reset() {
+    canMakeSave = true;
+    velocityTracker.reset();
+    leftArm.moveToDownPosition();
+    rightArm.moveToDownPosition();
+    leftLeg.moveToUpPosition();
+    rightLeg.moveToUpPosition();
+  }
 
   public void makeSave() {
-    double box =
-        1; // box where the puck is going, 1-6, 3 across, 2 down, starting at the top left from the
-    // perspective of the robot
-    // double secondsToImpact = velocityTracker.getSecondsToImpact();
-    // double[] hitPoint = velocityTracker.getHitPoint();
+    if (!canMakeSave) return;
+    double secondsToImpact = velocityTracker.getSecondsToImpact();
+    double[] hitPoint = velocityTracker.getHitPoint();
+    if (secondsToImpact > Constants.Robot.secondsBeforeSave) return;
+    if (hitPoint[1] > Constants.Robot.armActivationMaxHeight) // if too high do nothing
+    return;
 
-    // if (hitPoint[0] > -Constants.Robot.width / 2) box++;
-    // if (hitPoint[0] > Constants.Robot.width / 2) box++;
-    // if (hitPoint[1] < 0) box += 3;
+    canMakeSave = false;
+    if (hitPoint[1] > Constants.Robot.armActivationMinHeight) {
+      if (hitPoint[0] > Constants.Robot.width / 2) {
+        rightArm.moveFromRange(
+            Constants.Robot.armActivationMinHeight,
+            Constants.Robot.armActivationMaxHeight,
+            hitPoint[1]);
+      } else if (hitPoint[0] < -Constants.Robot.width / 2) {
+        leftArm.moveFromRange(
+            Constants.Robot.armActivationMinHeight,
+            Constants.Robot.armActivationMaxHeight,
+            hitPoint[1]);
+      }
+    } else {
+      if (hitPoint[0] > Constants.Robot.width / 2) {
+        rightLeg.moveToDownPosition();
+      } else if (hitPoint[0] < -Constants.Robot.width / 2) {
+        leftLeg.moveToDownPosition();
+      }
+    }
   }
 }

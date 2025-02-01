@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.XboxController;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -14,13 +17,15 @@ package frc.robot;
  */
 public final class Constants {
 
-  public final class Controller {
-    public static final int port = 0;
-  }
-
   public final class Robot {
-    public static final double width = 2;
-    public static final double height = 2;
+    public static final double width = 2; // metres
+    public static final double height = 2; // metres
+    public static final double armActivationMinHeight =
+        0; // metres from position on robot camera positions are based on
+    public static final double armActivationMaxHeight =
+        1.5; // metres from position on robot camera positions are based on
+    public static final double secondsBeforeSave =
+        1; // seconds before impact where robot will make a save
   }
 
   public final class Legs {
@@ -82,20 +87,41 @@ public final class Constants {
     public static final int leftArmMotor = 4;
     public static final int rightArmMotor = 3;
     public static final int headMotor = 5;
+    public static final int headLowerLimit = 1;
+    public static final int headUpperLimit = 2;
   }
 
-  public final class Controls {
-    public final class XboxController {
-      public static final int updatePIDsButton = 1;
-      public static final int leftLegToggleButton = 3;
-      public static final int rightLegToggleButton = 2;
-      public static final int enableButton = 4;
-      public static final int leftArmChannel = 1;
-      public static final int rightArmChannel = 3;
-      public static final int clearCameraDataButton = 5;
-      public static final int switchTestModeButton = 6;
-      public static final int toggleHeadButton = 7;
-      public static final int zeroHeadButton = 8;
+  public final class Vision {
+    public final class upperCamera {
+      public static final String address = "Arducam_OV9281_USB_Camera";
+      public static final double xOffset = 0;
+      public static final double yOffset = 1;
+    }
+
+    public final class lowerCamera {
+      public static final String address = "Arducam_OV9281_USB_Camera (1)";
+      public static final double xOffset = 0;
+      public static final double yOffset = -1;
+    }
+  }
+
+  public final class Control {
+    public final class Main {
+      public static final int port = 0;
+      public static final int updatePIDsButton = XboxController.Button.kA.value;
+      public static final int leftLegToggleButton = XboxController.Button.kX.value;
+      public static final int rightLegToggleButton = XboxController.Button.kB.value;
+      public static final int enableButton = XboxController.Button.kY.value;
+      public static final int leftArmChannel = XboxController.Axis.kLeftY.value;
+      public static final int rightArmChannel = XboxController.Axis.kRightX.value;
+      public static final int clearCameraDataButton = XboxController.Button.kLeftBumper.value;
+      public static final int switchTestModeButton = XboxController.Button.kRightBumper.value;
+      public static final int toggleHeadButton = XboxController.Button.kStart.value;
+      public static final int zeroHeadButton = XboxController.Button.kBack.value;
+    }
+
+    public final class Support {
+      public static final int port = 1;
     }
   }
 
@@ -106,9 +132,25 @@ public final class Constants {
       public static final double D = 0.5;
     }
 
-    public class Positions {
-      public static final double maxPosition = 2048 * 55;
-      public static final double minPosition = 2048 / 4;
+    public final class Positions {
+      public static final double maxPosition = 2000;
+      public static final double minPosition = 500;
+    }
+  }
+
+  public final class Drivebase {
+    public static final double maxSpeed = Units.feetToMeters(1);
+
+    public final class TranslationPID {
+      public static final double p = 0.7;
+      public static final double i = 0;
+      public static final double d = 0;
+    }
+
+    public final class RotationPID {
+      public static final double p = 0.4;
+      public static final double i = 0;
+      public static final double d = 0.01;
     }
   }
 }

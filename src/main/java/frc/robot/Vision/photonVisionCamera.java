@@ -1,10 +1,10 @@
-package frc.robot.Subsystems;
+package frc.robot.Vision;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class photonVisionCamera extends SubsystemBase {
+public class photonVisionCamera {
   private NetworkTable table;
 
   public photonVisionCamera(String cameraName) {
