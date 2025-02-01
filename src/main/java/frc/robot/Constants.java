@@ -107,8 +107,8 @@ public final class Constants {
     }
 
     public class Positions {
-      public static final double maxPosition = 2000;
-      public static final double minPosition = 500;
+      public static final double maxPosition = 2048 * 55;
+      public static final double minPosition = 2048 / 4;
     }
   }
 }

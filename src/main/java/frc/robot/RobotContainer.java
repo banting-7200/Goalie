@@ -162,7 +162,7 @@ public class RobotContainer {
   public void enabledPeriodic() {
     loop.poll();
     lights.run();
-    head.testRun();
+    head.run();
     // leftLeg.run();
     // rightLeg.run();
     // leftArm.run();
