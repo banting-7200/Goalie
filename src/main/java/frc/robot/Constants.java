@@ -82,13 +82,14 @@ public final class Constants {
   }
 
   public final class DeviceIDs {
-    public static final int leftLegMotor = 1;
-    public static final int rightLegMotor = 2;
-    public static final int leftArmMotor = 4;
-    public static final int rightArmMotor = 3;
-    public static final int headMotor = 5;
-    public static final int headLowerLimit = 1;
-    public static final int headUpperLimit = 2;
+    public static final int leftLegMotor = 3;
+    public static final int rightLegMotor = 4;
+    public static final int leftArmMotor = 5;
+    public static final int rightArmMotor = 6;
+    public static final int headMotor = 7;
+    public static final int headLowerLimit = 0;
+    public static final int headUpperLimit = 1;
+    public static final int lights = 0;
   }
 
   public final class Vision {

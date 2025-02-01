@@ -45,12 +45,7 @@ public class RobotContainer {
 
   private ShuffleboardSubsystem shuffle = ShuffleboardSubsystem.getInstance();
 
-  Command driveFieldOrientedDirectAngle =
-      drivebase.driveCommand(
-          () -> MathUtil.applyDeadband(-controller.getLeftY(), 0.1),
-          () -> MathUtil.applyDeadband(-controller.getLeftX(), 0.1),
-          () -> -controller.getRightX(),
-          () -> -controller.getRightY());
+  Command driveFieldOrientedDirectAngle;
 
   public RobotContainer() {
     shuffle.setTab("Status");
@@ -99,6 +94,13 @@ public class RobotContainer {
             lowerCamera.yOffset);
 
     drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo"));
+
+    driveFieldOrientedDirectAngle =
+        drivebase.driveCommand(
+            () -> MathUtil.applyDeadband(-controller.getLeftY(), 0.1),
+            () -> MathUtil.applyDeadband(-controller.getLeftX(), 0.1),
+            () -> -controller.getRightX(),
+            () -> -controller.getRightY());
 
     head =
         new HeadSubsystem(
@@ -193,16 +195,16 @@ public class RobotContainer {
 
   public void enabledPeriodic() {
     // lights.run();
-    head.run();
-    leftLeg.run();
-    rightLeg.run();
-    leftArm.run();
-    rightArm.run();
+    // head.run();
+    // leftLeg.run();
+    // rightLeg.run();
+    // leftArm.run();
+    // rightArm.run();
   }
 
   public void testPeriodic() {
-    leftArm.moveFromRange(-1, 1, controller.getLeftY());
-    rightArm.moveFromRange(-1, 1, controller.getLeftY());
+    // leftArm.moveFromRange(-1, 1, controller.getLeftY());
+    // rightArm.moveFromRange(-1, 1, controller.getLeftY());
     testLoop.poll();
   }
 
