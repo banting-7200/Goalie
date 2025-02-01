@@ -25,7 +25,7 @@ public final class Constants {
     public static final double armActivationMaxHeight =
         1.5; // metres from position on robot camera positions are based on
     public static final double secondsBeforeSave =
-        1; // seconds before impact where robot will make a save
+        0.5; // seconds before impact where robot will make a save
   }
 
   public final class Legs {

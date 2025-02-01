@@ -230,7 +230,11 @@ public class RobotContainer {
         velocityTracker.trajectoryTest();
         break;
       case 5:
+        estimateHitPoint();
+        break;
+      case 6:
         estimateSave();
+        break;
       default:
         testMode = 0;
         break;
@@ -259,10 +263,19 @@ public class RobotContainer {
     shuffle.setNumber("Right Arm Current", rightArm.getCurrent());
   }
 
+  public void estimateHitPoint() {
+    if (!camera1.hasTarget() || !camera2.hasTarget()) return;
+    double[] hitPoint = velocityTracker.getHitPoint();
+    System.out.println(
+        String.format(
+            "hitpoint: %d, %d, %d, in %d seconds",
+            hitPoint[0], hitPoint[1], hitPoint[2], velocityTracker.getSecondsToImpact()));
+  }
+
   public void estimateSave() {
+    if (!camera1.hasTarget() || !camera2.hasTarget()) return;
     double secondsToImpact = velocityTracker.getSecondsToImpact();
     double[] hitPoint = velocityTracker.getHitPoint();
-
     if (hitPoint[0] > Constants.Robot.width / 2) {
       System.out.print("right");
     } else if (hitPoint[0] < -Constants.Robot.width / 2) {
@@ -295,10 +308,9 @@ public class RobotContainer {
     double secondsToImpact = velocityTracker.getSecondsToImpact();
     double[] hitPoint = velocityTracker.getHitPoint();
     if (secondsToImpact > Constants.Robot.secondsBeforeSave) return;
+    canMakeSave = false;
     if (hitPoint[1] > Constants.Robot.armActivationMaxHeight) // if too high do nothing
     return;
-
-    canMakeSave = false;
     if (hitPoint[1] > Constants.Robot.armActivationMinHeight) {
       if (hitPoint[0] > Constants.Robot.width / 2) {
         rightArm.moveFromRange(
