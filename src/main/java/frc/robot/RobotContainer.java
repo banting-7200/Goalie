@@ -4,9 +4,8 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,11 +14,11 @@ import frc.robot.Constants.Vision.lowerCamera;
 import frc.robot.Constants.Vision.upperCamera;
 import frc.robot.Subsystems.*;
 import frc.robot.Vision.*;
-import java.io.File;
 
 public class RobotContainer {
 
-  XboxController controller = new XboxController(Constants.Control.Main.port);
+  XboxController controller = new XboxController(Constants.Control.Main.controllerPort);
+  Joystick buttonBox = new Joystick(Constants.Control.Main.buttonBoxPort);
 
   public LegSubsystem leftLeg;
   public LegSubsystem rightLeg;
@@ -93,14 +92,14 @@ public class RobotContainer {
             lowerCamera.xOffset,
             lowerCamera.yOffset);
 
-    drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo"));
+    // drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo"));
 
-    driveFieldOrientedDirectAngle =
-        drivebase.driveCommand(
-            () -> MathUtil.applyDeadband(-controller.getLeftY(), 0.1),
-            () -> MathUtil.applyDeadband(-controller.getLeftX(), 0.1),
-            () -> -controller.getRightX(),
-            () -> -controller.getRightY());
+    // driveFieldOrientedDirectAngle =
+    //     drivebase.driveCommand(
+    //         () -> MathUtil.applyDeadband(-controller.getLeftY(), 0.1),
+    //         () -> MathUtil.applyDeadband(-controller.getLeftX(), 0.1),
+    //         () -> -controller.getRightX(),
+    //         () -> -controller.getRightY());
 
     head =
         new HeadSubsystem(
@@ -155,15 +154,15 @@ public class RobotContainer {
     BooleanEvent updatePIDs =
         new BooleanEvent(testLoop, () -> controller.getRawButton(Control.Main.updatePIDsButton));
 
-    updatePIDs
-        .rising()
-        .ifHigh(
-            () -> {
-              double[] PID = shuffle.getPID("PID Tuner");
-              // Simply change the below line to tune PIDs for another object.
-              rightArm.setPID(PID);
-              System.out.println("UPDATING PIDS");
-            });
+    // updatePIDs
+    //     .rising()
+    //     .ifHigh(
+    //         () -> {
+    //           double[] PID = shuffle.getPID("PID Tuner");
+    //           // Simply change the below line to tune PIDs for another object.
+    //           rightArm.setPID(PID);
+    //           System.out.println("UPDATING PIDS");
+    //         });
 
     BooleanEvent switchTestMode =
         new BooleanEvent(
@@ -185,7 +184,7 @@ public class RobotContainer {
     resetBot.rising().ifHigh(() -> reset());
 
     zeroGyro.rising().ifHigh(() -> drivebase.zeroGyro());
-    drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
+    // drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
   }
 
   public void periodic() {
@@ -196,7 +195,7 @@ public class RobotContainer {
   public void enabledPeriodic() {
     // lights.run();
     // head.run();
-    // leftLeg.run();
+    leftLeg.run();
     // rightLeg.run();
     // leftArm.run();
     // rightArm.run();

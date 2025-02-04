@@ -18,8 +18,8 @@ import edu.wpi.first.wpilibj.XboxController;
 public final class Constants {
 
   public final class Robot {
-    public static final double width = 2; // metres
-    public static final double height = 2; // metres
+    public static final double width = 0.72; // metres
+    public static final double height = .25; // metres
     public static final double armActivationMinHeight =
         0; // metres from position on robot camera positions are based on
     public static final double armActivationMaxHeight =
@@ -47,7 +47,7 @@ public final class Constants {
     }
 
     public final class motorControllerConfigurations {
-      public static final int currentLimit = 40;
+      public static final int currentLimit = 20;
     }
   }
 
@@ -66,18 +66,18 @@ public final class Constants {
     }
 
     public class Positions {
-      public static final double leftMaxPosition = 270; // 217
-      public static final double leftMinPosition = 222; // 171
+      public static final double leftMaxPosition = 115; // 217
+      public static final double leftMinPosition = 44.5; // 171
 
-      public static final double rightMaxPosition = 320; // 292
-      public static final double rightMinPosition = 230; // 232
+      public static final double rightMaxPosition = 161; // 292
+      public static final double rightMinPosition = 93.5; // 232
 
       public static final double upperStopRange = 2;
       public static final double lowerStopRange = 5;
     }
 
     public final class motorControllerConfigurations {
-      public static final int currentLimit = 40;
+      public static final int currentLimit = 20;
     }
   }
 
@@ -108,7 +108,8 @@ public final class Constants {
 
   public final class Control {
     public final class Main {
-      public static final int port = 0;
+      public static final int controllerPort = 0;
+      public static final int buttonBoxPort = 1;
       public static final int updatePIDsButton = XboxController.Button.kA.value;
       public static final int leftLegToggleButton = XboxController.Button.kX.value;
       public static final int rightLegToggleButton = XboxController.Button.kB.value;
@@ -134,8 +135,8 @@ public final class Constants {
     }
 
     public final class Positions {
-      public static final double maxPosition = 2000;
-      public static final double minPosition = 500;
+      public static final double maxPosition = 30000;
+      public static final double minPosition = 2000;
     }
   }
 

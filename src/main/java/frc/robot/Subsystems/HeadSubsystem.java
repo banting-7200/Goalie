@@ -1,7 +1,5 @@
 package frc.robot.Subsystems;
 
-import static edu.wpi.first.units.Units.*;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -20,7 +18,7 @@ public class HeadSubsystem {
   int PIDControllerSlot = 0;
   boolean upPosition = false;
   boolean enabledMovement = false;
-  boolean doesCodeHaveMotorPriority = false;
+  boolean doesCodeHaveMotorPriority = true;
 
   public HeadSubsystem(int headMotorID, int lowerLimitSwitchID, int upperLimitSwitchID) {
     headMotor = new TalonFX(headMotorID);
@@ -30,7 +28,7 @@ public class HeadSubsystem {
     headMotor.configSelectedFeedbackSensor(
         TalonFXFeedbackDevice.IntegratedSensor, PIDControllerSlot, timeOutMs);
     headMotor.setSensorPhase(true);
-    headMotor.setInverted(false);
+    headMotor.setInverted(true);
     headMotor.configPeakOutputForward(1, timeOutMs);
     headMotor.configPeakOutputReverse(-1, timeOutMs);
     headMotor.configNominalOutputForward(0, timeOutMs);
@@ -50,10 +48,10 @@ public class HeadSubsystem {
   }
 
   public boolean withinLimits() {
-    if (!lowerLimitSwitch.get()) {
+    if (lowerLimitSwitch.get() && upperLimitSwitch.get()) {
       return true;
     }
-    System.out.println("Limits hit: " + lowerLimitSwitch.get());
+    System.out.println("Limits hit: " + lowerLimitSwitch.get() + " | " + upperLimitSwitch.get());
     return false;
   }
 
@@ -76,6 +74,7 @@ public class HeadSubsystem {
     while (withinLimits() && enabledMovement) {
       headMotor.set(ControlMode.PercentOutput, -0.06);
     }
+    headMotor.set(ControlMode.PercentOutput, 0);
     System.out.println("hit zero limit");
     headMotor.setSelectedSensorPosition(0);
     setPoint = Head.Positions.minPosition;
@@ -91,7 +90,7 @@ public class HeadSubsystem {
   public void run() {
     if (withinLimits() && enabledMovement && !doesCodeHaveMotorPriority) {
       headMotor.set(ControlMode.Position, setPoint);
-    } else {
+    } else if (!doesCodeHaveMotorPriority) {
       // headMotor.set(ControlMode.PercentOutput, 0);
     }
   }

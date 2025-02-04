@@ -32,7 +32,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
-    m_robotContainer.head.testReZeroEncoder();
+    // m_robotContainer.head.testReZeroEncoder();
   }
 
   @Override
@@ -76,7 +76,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    m_robotContainer.teleopPeriodic();
+    m_robotContainer.testPeriodic();
     m_robotContainer.enabledPeriodic();
   }
 
@@ -89,7 +89,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {
-    m_robotContainer.testPeriodic();
+    m_robotContainer.teleopPeriodic();
     m_robotContainer.enabledPeriodic();
   }
 
