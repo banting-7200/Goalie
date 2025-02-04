@@ -36,18 +36,18 @@ public final class Constants {
     }
 
     public class Positions {
-      public static final double leftUpPosition = 239;
-      public static final double leftDownPosition = 175;
+      public static final double leftUpPosition = 119;
+      public static final double leftDownPosition = 44.5;
 
-      public static final double rightUpPosition = 130;
-      public static final double rightDownPosition = 52;
+      public static final double rightUpPosition = 165;
+      public static final double rightDownPosition = 93.5;
 
       public static final double upperStopRange = 1;
       public static final double lowerStopRange = 5;
     }
 
     public final class motorControllerConfigurations {
-      public static final int currentLimit = 20;
+      public static final int currentLimit = 40;
     }
   }
 
@@ -66,8 +66,8 @@ public final class Constants {
     }
 
     public class Positions {
-      public static final double leftMaxPosition = 115; // 217
-      public static final double leftMinPosition = 44.5; // 171
+      public static final double leftMaxPosition = 192; // 217
+      public static final double leftMinPosition = 138; // 171
 
       public static final double rightMaxPosition = 161; // 292
       public static final double rightMinPosition = 93.5; // 232
@@ -118,7 +118,7 @@ public final class Constants {
       public static final int rightArmChannel = XboxController.Axis.kRightX.value;
       public static final int clearCameraDataButton = XboxController.Button.kLeftBumper.value;
       public static final int switchTestModeButton = XboxController.Button.kRightBumper.value;
-      public static final int toggleHeadButton = XboxController.Button.kStart.value;
+      public static final int toggleHeadButton = 8;
       public static final int zeroHeadButton = XboxController.Button.kBack.value;
     }
 

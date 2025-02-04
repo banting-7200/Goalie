@@ -4,8 +4,8 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -122,7 +122,7 @@ public class RobotContainer {
     BooleanEvent toggleRightLeg =
         new BooleanEvent(
             testLoop, () -> controller.getRawButton(Control.Main.rightLegToggleButton));
-    toggleRightLeg.rising().ifHigh(() -> head.toggleHead());
+    toggleRightLeg.rising().ifHigh(() -> rightLeg.togglePosition());
 
     BooleanEvent toggleHead =
         new BooleanEvent(testLoop, () -> controller.getRawButton(Control.Main.toggleHeadButton));
@@ -194,9 +194,9 @@ public class RobotContainer {
 
   public void enabledPeriodic() {
     // lights.run();
-    // head.run();
+    head.run();
     leftLeg.run();
-    // rightLeg.run();
+    rightLeg.run();
     // leftArm.run();
     // rightArm.run();
   }
