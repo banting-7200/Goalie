@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import java.io.File;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
@@ -92,14 +96,14 @@ public class RobotContainer {
             lowerCamera.xOffset,
             lowerCamera.yOffset);
 
-    // drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo"));
+    drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo"));
 
-    // driveFieldOrientedDirectAngle =
-    //     drivebase.driveCommand(
-    //         () -> MathUtil.applyDeadband(-controller.getLeftY(), 0.1),
-    //         () -> MathUtil.applyDeadband(-controller.getLeftX(), 0.1),
-    //         () -> -controller.getRightX(),
-    //         () -> -controller.getRightY());
+    driveFieldOrientedDirectAngle =
+        drivebase.driveCommand(
+            () -> MathUtil.applyDeadband(-controller.getLeftY(), 0.1),
+            () -> MathUtil.applyDeadband(-controller.getLeftX(), 0.1),
+            () -> -controller.getRightX(),
+            () -> -controller.getRightY());
 
     head =
         new HeadSubsystem(
@@ -133,9 +137,9 @@ public class RobotContainer {
     zeroHead.rising().ifHigh(() -> head.zeroEncoder());
 
     // Comment toggleRightArm if using joystick to control
-    BooleanEvent toggleRightArm = new BooleanEvent(testLoop, () -> controller.getBButton());
+    // BooleanEvent toggleRightArm = new BooleanEvent(testLoop, () -> controller.getBButton());
 
-    toggleRightArm.rising().ifHigh(() -> rightArm.toggleArmPosition());
+    // toggleRightArm.rising().ifHigh(() -> rightArm.toggleArmPosition());
 
     BooleanEvent toggleSafeMode =
         new BooleanEvent(testLoop, () -> controller.getRawButton(Control.Main.enableButton));
@@ -184,10 +188,11 @@ public class RobotContainer {
     resetBot.rising().ifHigh(() -> reset());
 
     zeroGyro.rising().ifHigh(() -> drivebase.zeroGyro());
-    // drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
+     drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
   }
 
   public void periodic() {
+    System.out.println(rightLeg.getPosition());
     updateShuffle();
     updateTests();
   }
@@ -197,13 +202,13 @@ public class RobotContainer {
     head.run();
     leftLeg.run();
     rightLeg.run();
-    // leftArm.run();
-    // rightArm.run();
+    leftArm.run();
+    rightArm.run();
   }
 
   public void testPeriodic() {
     // leftArm.moveFromRange(-1, 1, controller.getLeftY());
-    // rightArm.moveFromRange(-1, 1, controller.getLeftY());
+    // rightArm.moveFromRange(-1, 1, controller.getRightY());
     testLoop.poll();
   }
 

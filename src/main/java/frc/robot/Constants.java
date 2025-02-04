@@ -30,7 +30,7 @@ public final class Constants {
 
   public final class Legs {
     public class PID {
-      public static final double P = 0.007;
+      public static final double P = 0.009;
       public static final double I = 0.003;
       public static final double D = 0.002;
     }
@@ -39,10 +39,10 @@ public final class Constants {
       public static final double leftUpPosition = 119;
       public static final double leftDownPosition = 44.5;
 
-      public static final double rightUpPosition = 165;
+      public static final double rightUpPosition = 163.3;
       public static final double rightDownPosition = 93.5;
 
-      public static final double upperStopRange = 1;
+      public static final double upperStopRange = 0;
       public static final double lowerStopRange = 5;
     }
 
@@ -69,10 +69,10 @@ public final class Constants {
       public static final double leftMaxPosition = 192; // 217
       public static final double leftMinPosition = 138; // 171
 
-      public static final double rightMaxPosition = 161; // 292
-      public static final double rightMinPosition = 93.5; // 232
+      public static final double rightMaxPosition = 353; // 292
+      public static final double rightMinPosition = 293; // 232
 
-      public static final double upperStopRange = 2;
+      public static final double upperStopRange = 1;
       public static final double lowerStopRange = 5;
     }
 

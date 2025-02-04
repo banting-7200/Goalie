@@ -32,7 +32,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
-    // m_robotContainer.head.testReZeroEncoder();
   }
 
   @Override

@@ -79,6 +79,10 @@ public class LegSubsystem extends SubsystemBase {
     return setPosition;
   }
 
+  public double getPosition() {
+    return encoder.getPosition();
+  }
+
   public void run() {
     currentPosition = encoder.getPosition();
     if (isUp && enabled) {
