@@ -35,9 +35,9 @@ public class LegSubsystem extends SubsystemBase {
     encoder = motor.getAbsoluteEncoder();
     PIDController = motor.getPIDController();
 
-    PIDController.setP(Legs.PID.P);
-    PIDController.setI(Legs.PID.I);
-    PIDController.setD(Legs.PID.D);
+    PIDController.setP(0);
+    PIDController.setI(0);
+    PIDController.setD(0);
     PIDController.setFF(0);
     PIDController.setIZone(1.5);
     PIDController.setOutputRange(-1, 1);
@@ -130,6 +130,12 @@ public class LegSubsystem extends SubsystemBase {
 
   public boolean isEnabled() {
     return enabled;
+  }
+
+  public void setPID(double P, double I, double D) {
+    PIDController.setP(P);
+    PIDController.setI(I);
+    PIDController.setD(D);
   }
 
   public void setPID(double[] PID) {

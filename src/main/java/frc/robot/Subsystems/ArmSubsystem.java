@@ -61,17 +61,14 @@ public class ArmSubsystem extends SubsystemBase {
     if (enabled) {
       if (setPosition > currentPosition) {
         if (!withinUpperLimits()) {
-          System.out.println("Within Upper");
+          System.out.println("Within Upper Arm Limit");
           return;
         } else if (!withinLowerLimits()) {
-          System.out.println("Within Lower");
+          System.out.println("Within Lower Arm Limit");
           return;
         }
       }
-      System.out.println("Setting Position");
       PIDController.setReference(setPosition, CANSparkMax.ControlType.kPosition);
-      System.out.println(
-          "Current Position: " + currentPosition + " | " + "Setpoint: " + setPosition);
     } else {
       motor.set(0);
     }

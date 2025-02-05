@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import java.io.File;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Joystick;
@@ -18,6 +16,7 @@ import frc.robot.Constants.Vision.lowerCamera;
 import frc.robot.Constants.Vision.upperCamera;
 import frc.robot.Subsystems.*;
 import frc.robot.Vision.*;
+import java.io.File;
 
 public class RobotContainer {
 
@@ -59,12 +58,16 @@ public class RobotContainer {
             Legs.Positions.leftUpPosition,
             false);
 
+    leftLeg.setPID(Legs.leftPID.P, Legs.leftPID.I, Legs.leftPID.D);
+
     rightLeg =
         new LegSubsystem(
             DeviceIDs.rightLegMotor,
             Legs.Positions.rightDownPosition,
             Legs.Positions.rightUpPosition,
             true);
+
+    rightLeg.setPID(Legs.rightPID.P, Legs.rightPID.I, Legs.rightPID.D);
 
     leftArm =
         new ArmSubsystem(
@@ -188,11 +191,10 @@ public class RobotContainer {
     resetBot.rising().ifHigh(() -> reset());
 
     zeroGyro.rising().ifHigh(() -> drivebase.zeroGyro());
-     drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
+    // drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
   }
 
   public void periodic() {
-    System.out.println(rightLeg.getPosition());
     updateShuffle();
     updateTests();
   }
@@ -207,8 +209,8 @@ public class RobotContainer {
   }
 
   public void testPeriodic() {
-    // leftArm.moveFromRange(-1, 1, controller.getLeftY());
-    // rightArm.moveFromRange(-1, 1, controller.getRightY());
+    leftArm.moveFromRange(-1, 1, controller.getLeftY());
+    rightArm.moveFromRange(-1, 1, controller.getRightY());
     testLoop.poll();
   }
 

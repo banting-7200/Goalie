@@ -29,7 +29,13 @@ public final class Constants {
   }
 
   public final class Legs {
-    public class PID {
+    public class leftPID {
+      public static final double P = 0.009;
+      public static final double I = 0.003;
+      public static final double D = 0.002;
+    }
+
+    public class rightPID {
       public static final double P = 0.009;
       public static final double I = 0.003;
       public static final double D = 0.002;
@@ -54,15 +60,15 @@ public final class Constants {
   public final class Arms {
 
     public class RightPID {
-      public static final double P = 0.005;
+      public static final double P = 0.025;
       public static final double I = 0;
-      public static final double D = 0.001;
+      public static final double D = 0.016;
     }
 
     public class LeftPID {
-      public static final double P = 0.009;
+      public static final double P = 0.135;
       public static final double I = 0;
-      public static final double D = 0.004;
+      public static final double D = 0.114;
     }
 
     public class Positions {
