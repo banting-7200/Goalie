@@ -84,7 +84,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   private boolean withinUpperLimits() {
-    return (currentPosition < upPosition - upperStopRange);
+    return (currentPosition < upPosition + upperStopRange);
   }
 
   private boolean withinLowerLimits() {

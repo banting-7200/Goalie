@@ -49,7 +49,7 @@ public class Robot extends TimedRobot {
     m_robotContainer.leftArm.setEnabled(false);
     m_robotContainer.PDH.setSwitchableChannel(false);
     m_robotContainer.velocityTracker.reset();
-    m_robotContainer.canMakeSave = true;
+    m_robotContainer.canMakeSave = false;
   }
 
   @Override

@@ -4,8 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.XboxController;
@@ -17,12 +18,13 @@ import frc.robot.Constants.*;
 import frc.robot.Constants.Vision;
 import frc.robot.Subsystems.*;
 import frc.robot.Vision.*;
+import java.io.File;
 import org.photonvision.PhotonCamera;
 
 public class RobotContainer {
 
   XboxController driveController = new XboxController(Constants.Control.Main.controllerPort);
-  Joystick buttonBox = new Joystick(Constants.Control.Support.port);
+  // Joystick buttonBox = new Joystick(Constants.Control.Support.port);
 
   public LegSubsystem leftLeg;
   public LegSubsystem rightLeg;
@@ -44,11 +46,11 @@ public class RobotContainer {
 
   public DualCameraVelocityTracker velocityTracker;
 
-  private int testMode = 7;
+  private int testMode = 0;
 
   public boolean canMakeSave = false;
 
-  private boolean manualMode = true;
+  private boolean manualMode = false;
 
   private EventLoop manualLoop = new EventLoop();
   private EventLoop autoLoop = new EventLoop();
@@ -116,14 +118,14 @@ public class RobotContainer {
             Vision.LowerCamera.upTilt,
             Vision.LowerCamera.rightTilt);
 
-    // drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo"));
+    drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo"));
 
-    // driveFieldOrientedDirectAngle =
-    //     drivebase.driveCommand(
-    //         () -> MathUtil.applyDeadband(-driveController.getLeftY(), 0.1),
-    //         () -> MathUtil.applyDeadband(-driveController.getLeftX(), 0.1),
-    //         () -> -driveController.getRightX(),
-    //         () -> -driveController.getRightY());
+    driveFieldOrientedDirectAngle =
+        drivebase.driveCommand(
+            () -> MathUtil.applyDeadband(-driveController.getLeftY(), 0.1),
+            () -> MathUtil.applyDeadband(-driveController.getLeftX(), 0.1),
+            () -> -driveController.getRightX(),
+            () -> -driveController.getRightY());
 
     head =
         new HeadSubsystem(
@@ -167,7 +169,8 @@ public class RobotContainer {
     // toggleRightArm.rising().ifHigh(() -> rightArm.toggleArmPosition());
 
     BooleanEvent toggleSafeMode =
-        new BooleanEvent(manualLoop, () -> driveController.getRawButton(Control.Main.enableButton));
+        new BooleanEvent(
+            enabledLoop, () -> driveController.getRawButton(Control.Main.enableButton));
 
     toggleSafeMode
         .rising()
@@ -208,7 +211,7 @@ public class RobotContainer {
 
     BooleanEvent zeroGyro =
         new BooleanEvent(
-            manualLoop, () -> driveController.getRawButton(Control.Main.zeroGyroButton));
+            enabledLoop, () -> driveController.getRawButton(Control.Main.zeroGyroButton));
 
     BooleanEvent resetBot =
         new BooleanEvent(
@@ -219,8 +222,8 @@ public class RobotContainer {
     //     new BooleanEvent(enabledLoop, () -> buttonBox.getRawButton(Control.Support.modeToggle));
     // toggleMode.rising().ifHigh(() -> manualMode = !manualMode);
 
-    // zeroGyro.rising().ifHigh(() -> drivebase.zeroGyro());
-    // drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
+    zeroGyro.rising().ifHigh(() -> drivebase.zeroGyro());
+    if (!manualMode) drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
   }
 
   public void periodic() {
@@ -234,10 +237,11 @@ public class RobotContainer {
     leftLeg.run();
     rightLeg.run();
     leftArm.run();
-    rightArm.run();
+    // rightArm.run();
+    enabledLoop.poll();
     if (manualMode) {
-      leftArm.moveFromRange(-1, 1, driveController.getLeftY());
-      rightArm.moveFromRange(-1, 1, driveController.getRightY());
+      // leftArm.moveFromRange(-1, 1, driveController.getLeftY());
+      // rightArm.moveFromRange(-1, 1, driveController.getRightY());
       manualLoop.poll();
     } else {
       autoLoop.poll();
@@ -319,6 +323,7 @@ public class RobotContainer {
     rightArm.moveToDownPosition();
     leftLeg.moveToUpPosition();
     rightLeg.moveToUpPosition();
+    // alignToNet();
   }
 
   public void makeSave() {
