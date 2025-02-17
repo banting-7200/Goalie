@@ -3,10 +3,10 @@ package frc.robot.Vision;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-public class photonVisionCamera {
+public class PhotonVisionCamera {
   private NetworkTable table;
 
-  public photonVisionCamera(String cameraName) {
+  public PhotonVisionCamera(String cameraName) {
     table = NetworkTableInstance.getDefault().getTable("photonvision").getSubTable(cameraName);
   }
 
@@ -35,6 +35,18 @@ public class photonVisionCamera {
   }
 
   public void test() {
-    System.out.println("Yaw:" + getTargetYaw() + "Pitch" + getTargetPitch());
+    System.out.println(
+        "Yaw:"
+            + String.format("%.2f", getTargetYaw())
+            + "Pitch"
+            + String.format("%.2f", getTargetPitch()));
+  }
+
+  public double getTargetPixelsX() {
+    return (double) table.getEntry("targetPixelsX").getNumber(-1);
+  }
+
+  public double getTargetPixelsY() {
+    return (double) table.getEntry("targetPixelsY").getNumber(-1);
   }
 }

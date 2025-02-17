@@ -47,6 +47,9 @@ public class Robot extends TimedRobot {
     m_robotContainer.rightLeg.setEnabled(false);
     m_robotContainer.rightArm.setEnabled(false);
     m_robotContainer.leftArm.setEnabled(false);
+    m_robotContainer.PDH.setSwitchableChannel(false);
+    m_robotContainer.velocityTracker.reset();
+    m_robotContainer.canMakeSave = true;
   }
 
   @Override
@@ -70,6 +73,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    m_robotContainer.PDH.setSwitchableChannel(true);
   }
 
   /** This function is called periodically during operator control. */
@@ -82,6 +86,7 @@ public class Robot extends TimedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+    m_robotContainer.PDH.setSwitchableChannel(true);
   }
 
   /** This function is called periodically during test mode. */

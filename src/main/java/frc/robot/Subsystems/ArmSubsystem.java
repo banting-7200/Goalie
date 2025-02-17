@@ -63,10 +63,10 @@ public class ArmSubsystem extends SubsystemBase {
         if (!withinUpperLimits()) {
           System.out.println("Within Upper Arm Limit");
           return;
-        } else if (!withinLowerLimits()) {
-          System.out.println("Within Lower Arm Limit");
-          return;
         }
+      } else if (!withinLowerLimits()) {
+        System.out.println("Within Lower Arm Limit");
+        return;
       }
       PIDController.setReference(setPosition, CANSparkMax.ControlType.kPosition);
     } else {

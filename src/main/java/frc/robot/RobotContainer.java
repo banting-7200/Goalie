@@ -4,19 +4,21 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Commands.NetAlignCommand;
 import frc.robot.Constants.*;
-import frc.robot.Constants.Vision.lowerCamera;
-import frc.robot.Constants.Vision.upperCamera;
+import frc.robot.Constants.Vision;
 import frc.robot.Subsystems.*;
 import frc.robot.Vision.*;
-import java.io.File;
+import org.photonvision.PhotonCamera;
 
 public class RobotContainer {
 
@@ -31,16 +33,21 @@ public class RobotContainer {
 
   public HeadSubsystem head;
 
-  public photonVisionCamera camera1;
-  public photonVisionCamera camera2;
+  public PhotonVisionCamera upperCamera;
+  public PhotonVisionCamera lowerCamera;
+  public PhotonVisionCamera backCamera;
+
+  public PhotonCamera puckAlign = new PhotonCamera(Constants.Vision.LowerCamera.address);
 
   public SwerveSubsystem drivebase;
 
+  public PowerDistribution PDH = new PowerDistribution(20, ModuleType.kRev);
+
   public DualCameraVelocityTracker velocityTracker;
 
-  private int testMode = 0;
+  private int testMode = 7;
 
-  private boolean canMakeSave = false;
+  public boolean canMakeSave = false;
 
   private boolean manualMode = true;
 
@@ -51,6 +58,8 @@ public class RobotContainer {
   private ShuffleboardSubsystem shuffle = ShuffleboardSubsystem.getInstance();
 
   private LightsSubsystem lights;
+
+  public double secondsBeforeSave;
 
   Command driveFieldOrientedDirectAngle;
 
@@ -92,26 +101,30 @@ public class RobotContainer {
 
     rightArm.setPID(Arms.RightPID.P, Arms.RightPID.I, Arms.RightPID.D);
 
-    camera1 = new photonVisionCamera(Constants.Vision.upperCamera.address);
-    camera2 = new photonVisionCamera(Constants.Vision.lowerCamera.address);
+    upperCamera = new PhotonVisionCamera(Constants.Vision.UpperCamera.address);
+    lowerCamera = new PhotonVisionCamera(Constants.Vision.LowerCamera.address);
 
     velocityTracker =
         new DualCameraVelocityTracker(
-            camera1,
-            upperCamera.xOffset,
-            upperCamera.yOffset,
-            camera2,
-            lowerCamera.xOffset,
-            lowerCamera.yOffset);
+            upperCamera,
+            Vision.UpperCamera.xOffset,
+            Vision.UpperCamera.yOffset,
+            Vision.UpperCamera.upTilt,
+            Vision.UpperCamera.rightTilt,
+            lowerCamera,
+            Vision.LowerCamera.xOffset,
+            Vision.LowerCamera.yOffset,
+            Vision.LowerCamera.upTilt,
+            Vision.LowerCamera.rightTilt);
 
-    drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo"));
+    // drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo"));
 
-    driveFieldOrientedDirectAngle =
-        drivebase.driveCommand(
-            () -> MathUtil.applyDeadband(-driveController.getLeftY(), 0.1),
-            () -> MathUtil.applyDeadband(-driveController.getLeftX(), 0.1),
-            () -> -driveController.getRightX(),
-            () -> -driveController.getRightY());
+    // driveFieldOrientedDirectAngle =
+    //     drivebase.driveCommand(
+    //         () -> MathUtil.applyDeadband(-driveController.getLeftY(), 0.1),
+    //         () -> MathUtil.applyDeadband(-driveController.getLeftX(), 0.1),
+    //         () -> -driveController.getRightX(),
+    //         () -> -driveController.getRightY());
 
     head =
         new HeadSubsystem(
@@ -135,7 +148,7 @@ public class RobotContainer {
     BooleanEvent toggleRightLeg =
         new BooleanEvent(
             manualLoop, () -> driveController.getRawButton(Control.Main.rightLegToggleButton));
-    toggleRightLeg.rising().ifHigh(() -> head.toggleHead());
+    toggleRightLeg.rising().ifHigh(() -> rightLeg.togglePosition());
 
     BooleanEvent toggleHead =
         new BooleanEvent(
@@ -203,12 +216,12 @@ public class RobotContainer {
             autoLoop, () -> driveController.getRawButton(Control.Main.clearCameraDataButton));
     resetBot.rising().ifHigh(() -> reset());
 
-    BooleanEvent toggleMode =
-        new BooleanEvent(enabledLoop, () -> buttonBox.getRawButton(Control.Support.modeToggle));
-    toggleMode.rising().ifHigh(() -> manualMode = !manualMode);
+    // BooleanEvent toggleMode =
+    //     new BooleanEvent(enabledLoop, () -> buttonBox.getRawButton(Control.Support.modeToggle));
+    // toggleMode.rising().ifHigh(() -> manualMode = !manualMode);
 
-    zeroGyro.rising().ifHigh(() -> drivebase.zeroGyro());
-    drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
+    // zeroGyro.rising().ifHigh(() -> drivebase.zeroGyro());
+    // drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
   }
 
   public void periodic() {
@@ -225,7 +238,7 @@ public class RobotContainer {
     rightArm.run();
     if (manualMode) {
       leftArm.moveFromRange(-1, 1, driveController.getLeftY());
-      rightArm.moveFromRange(-1, 1, driveController.getLeftY());
+      rightArm.moveFromRange(-1, 1, driveController.getRightY());
       manualLoop.poll();
     } else {
       autoLoop.poll();
@@ -234,15 +247,15 @@ public class RobotContainer {
   }
 
   public void updateTests() {
-    if (testMode != 0) System.out.print(String.valueOf(testMode) + "|");
+    // if (testMode != 0) System.out.print(String.valueOf(testMode) + "|");
     switch (testMode) {
       case 0:
         break;
       case 1:
-        camera1.test();
+        upperCamera.test();
         break;
       case 2:
-        camera2.test();
+        lowerCamera.test();
         break;
       case 3:
         velocityTracker.stationaryTest();
@@ -254,6 +267,9 @@ public class RobotContainer {
         estimateHitPoint();
         break;
       case 6:
+        countFrames();
+        break;
+      case 7:
         estimateSave();
         break;
       default:
@@ -285,34 +301,16 @@ public class RobotContainer {
   }
 
   public void estimateHitPoint() {
-    if (!camera1.hasTarget() || !camera2.hasTarget()) return;
+    if (!velocityTracker.hasTarget()) return;
     double[] hitPoint = velocityTracker.getHitPoint();
-    System.out.println(
-        String.format(
-            "hitpoint: %d, %d, %d, in %d seconds",
-            hitPoint[0], hitPoint[1], hitPoint[2], velocityTracker.getSecondsToImpact()));
-  }
-
-  public void estimateSave() {
-    if (!camera1.hasTarget() || !camera2.hasTarget()) return;
-    double secondsToImpact = velocityTracker.getSecondsToImpact();
-    double[] hitPoint = velocityTracker.getHitPoint();
-    if (hitPoint[0] > Constants.Robot.width / 2) {
-      System.out.print("right");
-    } else if (hitPoint[0] < -Constants.Robot.width / 2) {
-      System.out.print("left");
+    if (hitPoint == null) {
+      System.out.println("hasTarget");
     } else {
-      System.out.print("middle");
+      System.out.println(
+          String.format(
+              "hitpoint: %.2f, %.2f, in %.2f seconds",
+              hitPoint[0], hitPoint[1], velocityTracker.getSecondsToImpact()));
     }
-
-    if (hitPoint[1] > Constants.Robot.height / 2) {
-      System.out.print(" top");
-    } else if (hitPoint[1] < -Constants.Robot.height / 2) {
-      System.out.print(" middle");
-    } else {
-      System.out.print(" bottom");
-    }
-    System.out.println(" in " + secondsToImpact + " seconds ");
   }
 
   public void reset() {
@@ -329,20 +327,25 @@ public class RobotContainer {
     double secondsToImpact = velocityTracker.getSecondsToImpact();
     double[] hitPoint = velocityTracker.getHitPoint();
     if (secondsToImpact > Constants.Robot.secondsBeforeSave) return;
+
     canMakeSave = false;
-    if (hitPoint[1] > Constants.Robot.armActivationMaxHeight) // if too high do nothing
-    return;
+    if (hitPoint[1] > Constants.Robot.armActivationMaxHeight) { // if too high do nothing
+      drivebase.aimAtTarget(puckAlign);
+      return;
+    }
     if (hitPoint[1] > Constants.Robot.armActivationMinHeight) {
       if (hitPoint[0] > Constants.Robot.width / 2) {
         rightArm.moveFromRange(
             Constants.Robot.armActivationMinHeight,
             Constants.Robot.armActivationMaxHeight,
             hitPoint[1]);
+        drivebase.driveToPose(drivebase.getPose().plus(new Transform2d(0.4, 0, new Rotation2d())));
       } else if (hitPoint[0] < -Constants.Robot.width / 2) {
         leftArm.moveFromRange(
             Constants.Robot.armActivationMinHeight,
             Constants.Robot.armActivationMaxHeight,
             hitPoint[1]);
+        drivebase.driveToPose(drivebase.getPose().plus(new Transform2d(-0.4, 0, new Rotation2d())));
       }
     } else {
       if (hitPoint[0] > Constants.Robot.width / 2) {
@@ -351,5 +354,53 @@ public class RobotContainer {
         leftLeg.moveToDownPosition();
       }
     }
+  }
+
+  public void estimateSave() {
+    if (!canMakeSave) return;
+    if (velocityTracker.hasTarget()) {
+      if (velocityTracker.getSecondsToImpact() < Constants.Robot.secondsBeforeSave
+          && velocityTracker.getSecondsToImpact() > 0) {
+        canMakeSave = false;
+        double[] hitPoint = velocityTracker.getHitPoint();
+        if (hitPoint[0] > Constants.Robot.width / 2) {
+          System.out.print("right");
+        } else if (hitPoint[0] < -Constants.Robot.width / 2) {
+          System.out.print("left");
+        } else {
+          System.out.print("middle");
+        }
+        if (hitPoint[1] > Constants.Robot.armActivationMinHeight) {
+          if (hitPoint[1] < Constants.Robot.armActivationMaxHeight) {
+            double armPercent =
+                ((hitPoint[1] - Constants.Robot.armActivationMinHeight)
+                    / (Constants.Robot.armActivationMaxHeight
+                        - Constants.Robot.armActivationMinHeight));
+            System.out.println("arm " + armPercent);
+          } else {
+            System.out.println("too high");
+          }
+        } else {
+          System.out.println("leg");
+        }
+      } else {
+        System.out.println("hasTarget");
+      }
+    }
+  }
+
+  public void countFrames() {
+    if (velocityTracker.hasTarget()) {
+      if (velocityTracker.getSecondsToImpact() < Constants.Robot.secondsBeforeSave
+          && velocityTracker.getSecondsToImpact() > 0) {
+        System.out.println(velocityTracker.getSecondsToImpact());
+      } else {
+        System.out.println("hasTarget");
+      }
+    }
+  }
+
+  public void alignToNet() {
+    new NetAlignCommand(drivebase, backCamera);
   }
 }

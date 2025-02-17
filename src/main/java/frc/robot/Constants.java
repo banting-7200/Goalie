@@ -18,12 +18,12 @@ import edu.wpi.first.wpilibj.XboxController;
 public final class Constants {
 
   public final class Robot {
-    public static final double width = 0.72; // metres
+    public static final double width = 0.1; // metres
     public static final double height = .25; // metres
     public static final double armActivationMinHeight =
-        0; // metres from position on robot camera positions are based on
+        0.35; // metres from position on robot camera positions are based on
     public static final double armActivationMaxHeight =
-        1.5; // metres from position on robot camera positions are based on
+        0.90; // metres from position on robot camera positions are based on
     public static final double secondsBeforeSave =
         0.5; // seconds before impact where robot will make a save
   }
@@ -60,23 +60,23 @@ public final class Constants {
   public final class Arms {
 
     public class RightPID {
-      public static final double P = 0.025;
+      public static final double P = 0.005;
       public static final double I = 0;
-      public static final double D = 0.016;
+      public static final double D = 0.001;
     }
 
     public class LeftPID {
-      public static final double P = 0.135;
+      public static final double P = 0.035;
       public static final double I = 0;
-      public static final double D = 0.114;
+      public static final double D = 0.004;
     }
 
     public class Positions {
       public static final double leftMaxPosition = 192; // 217
       public static final double leftMinPosition = 138; // 171
 
-      public static final double rightMaxPosition = 353; // 292
-      public static final double rightMinPosition = 293; // 232
+      public static final double rightMaxPosition = 179; // 292
+      public static final double rightMinPosition = 139; // 232
 
       public static final double upperStopRange = 1;
       public static final double lowerStopRange = 5;
@@ -99,16 +99,20 @@ public final class Constants {
   }
 
   public final class Vision {
-    public final class upperCamera {
-      public static final String address = "Arducam_OV9281_USB_Camera";
+    public final class UpperCamera {
+      public static final String address = "UpperFrontCamera";
       public static final double xOffset = 0;
-      public static final double yOffset = 1;
+      public static final double yOffset = 0.89;
+      public static final double upTilt = -5;
+      public static final double rightTilt = -3;
     }
 
-    public final class lowerCamera {
-      public static final String address = "Arducam_OV9281_USB_Camera (1)";
+    public final class LowerCamera {
+      public static final String address = "LowerFrontCamera";
       public static final double xOffset = 0;
-      public static final double yOffset = -1;
+      public static final double yOffset = -.13;
+      public static final double upTilt = 15;
+      public static final double rightTilt = 0;
     }
   }
 
@@ -120,7 +124,7 @@ public final class Constants {
       public static final int rightLegToggleButton = XboxController.Button.kB.value;
       public static final int enableButton = XboxController.Button.kY.value;
       public static final int leftArmChannel = XboxController.Axis.kLeftY.value;
-      public static final int rightArmChannel = XboxController.Axis.kRightX.value;
+      public static final int rightArmChannel = XboxController.Axis.kRightY.value;
       public static final int clearCameraDataButton = XboxController.Button.kLeftBumper.value;
       public static final int switchTestModeButton = XboxController.Button.kRightBumper.value;
       public static final int toggleHeadButton = 8;
