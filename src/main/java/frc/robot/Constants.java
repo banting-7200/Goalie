@@ -18,12 +18,12 @@ import edu.wpi.first.wpilibj.XboxController;
 public final class Constants {
 
   public final class Robot {
-    public static final double width = 0.1; // metres
+    public static final double width = 0.2; // metres
     public static final double height = .25; // metres
     public static final double armActivationMinHeight =
         0.35; // metres from position on robot camera positions are based on
     public static final double armActivationMaxHeight =
-        0.90; // metres from position on robot camera positions are based on
+        0.55; // metres from position on robot camera positions are based on
     public static final double secondsBeforeSave =
         0.5; // seconds before impact where robot will make a save
   }

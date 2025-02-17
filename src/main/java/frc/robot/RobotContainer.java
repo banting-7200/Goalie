@@ -4,8 +4,7 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
@@ -324,34 +323,43 @@ public class RobotContainer {
 
   public void makeSave() {
     if (!canMakeSave) return;
-    double secondsToImpact = velocityTracker.getSecondsToImpact();
-    double[] hitPoint = velocityTracker.getHitPoint();
-    if (secondsToImpact > Constants.Robot.secondsBeforeSave) return;
-
-    canMakeSave = false;
-    if (hitPoint[1] > Constants.Robot.armActivationMaxHeight) { // if too high do nothing
-      drivebase.aimAtTarget(puckAlign);
-      return;
-    }
-    if (hitPoint[1] > Constants.Robot.armActivationMinHeight) {
-      if (hitPoint[0] > Constants.Robot.width / 2) {
-        rightArm.moveFromRange(
-            Constants.Robot.armActivationMinHeight,
-            Constants.Robot.armActivationMaxHeight,
-            hitPoint[1]);
-        drivebase.driveToPose(drivebase.getPose().plus(new Transform2d(0.4, 0, new Rotation2d())));
-      } else if (hitPoint[0] < -Constants.Robot.width / 2) {
-        leftArm.moveFromRange(
-            Constants.Robot.armActivationMinHeight,
-            Constants.Robot.armActivationMaxHeight,
-            hitPoint[1]);
-        drivebase.driveToPose(drivebase.getPose().plus(new Transform2d(-0.4, 0, new Rotation2d())));
-      }
-    } else {
-      if (hitPoint[0] > Constants.Robot.width / 2) {
-        rightLeg.moveToDownPosition();
-      } else if (hitPoint[0] < -Constants.Robot.width / 2) {
-        leftLeg.moveToDownPosition();
+    if (velocityTracker.hasTarget()) {
+      if (velocityTracker.getSecondsToImpact() < Constants.Robot.secondsBeforeSave
+          && velocityTracker.getSecondsToImpact() > 0) {
+        canMakeSave = false;
+        double[] hitPoint = velocityTracker.getHitPoint();
+        if (hitPoint[1] > Constants.Robot.armActivationMinHeight) {
+          if (hitPoint[1] < Constants.Robot.armActivationMaxHeight) {
+            double armPercent =
+                ((hitPoint[1] - Constants.Robot.armActivationMinHeight)
+                    / (Constants.Robot.armActivationMaxHeight
+                        - Constants.Robot.armActivationMinHeight));
+            if (hitPoint[0] > Constants.Robot.width / 2) {
+              rightArm.moveFromRange(0, 1, armPercent);
+              leftLeg.moveToMidPosition();
+              drivebase.drive(new Translation2d(0, 0), 0, true);
+            } else if (hitPoint[0] < -Constants.Robot.width / 2) {
+              leftArm.moveFromRange(0, 1, armPercent);
+              rightLeg.moveToMidPosition();
+              drivebase.drive(new Translation2d(0, 0), 0, true);
+            } else {
+              // torso
+            }
+          } else {
+            // too high
+          }
+        } else {
+          if (hitPoint[0] > Constants.Robot.width / 2) {
+            rightLeg.moveToDownPosition();
+          } else if (hitPoint[0] < -Constants.Robot.width / 2) {
+            leftLeg.moveToDownPosition();
+          } else {
+            rightLeg.moveToDownPosition();
+            leftLeg.moveToDownPosition();
+          }
+        }
+      } else {
+        System.out.println("has target");
       }
     }
   }
@@ -364,11 +372,11 @@ public class RobotContainer {
         canMakeSave = false;
         double[] hitPoint = velocityTracker.getHitPoint();
         if (hitPoint[0] > Constants.Robot.width / 2) {
-          System.out.print("right");
+          System.out.print("right ");
         } else if (hitPoint[0] < -Constants.Robot.width / 2) {
-          System.out.print("left");
+          System.out.print("left ");
         } else {
-          System.out.print("middle");
+          System.out.print("middle ");
         }
         if (hitPoint[1] > Constants.Robot.armActivationMinHeight) {
           if (hitPoint[1] < Constants.Robot.armActivationMaxHeight) {
@@ -384,7 +392,7 @@ public class RobotContainer {
           System.out.println("leg");
         }
       } else {
-        System.out.println("hasTarget");
+        System.out.println("has target");
       }
     }
   }

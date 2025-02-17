@@ -18,6 +18,7 @@ public class LegSubsystem extends SubsystemBase {
   private double lowerStopRange = Legs.Positions.lowerStopRange;
 
   private double upPosition;
+  private double midPosition;
   private double downPosition;
   private double currentPosition;
   private double setPosition;
@@ -29,6 +30,7 @@ public class LegSubsystem extends SubsystemBase {
 
     this.downPosition = downPosition;
     this.upPosition = upPosition;
+    midPosition = (upPosition + downPosition) / 2;
     setPosition = upPosition;
 
     motor = new CANSparkMax(deviceID, MotorType.kBrushless);
@@ -61,6 +63,10 @@ public class LegSubsystem extends SubsystemBase {
 
   public void moveToUpPosition() {
     setPosition(upPosition);
+  }
+
+  public void moveToMidPosition() {
+    setPosition(midPosition);
   }
 
   public void moveToDownPosition() {
