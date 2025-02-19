@@ -237,7 +237,7 @@ public class RobotContainer {
     leftLeg.run();
     rightLeg.run();
     leftArm.run();
-    // rightArm.run();
+    rightArm.run();
     enabledLoop.poll();
     if (manualMode) {
       // leftArm.moveFromRange(-1, 1, driveController.getLeftY());
@@ -301,6 +301,10 @@ public class RobotContainer {
     shuffle.setNumber("Right Arm Position", rightArm.getPosition());
     shuffle.setBoolean("Right Arm Enabled", rightArm.isEnabled());
     shuffle.setNumber("Right Arm Current", rightArm.getCurrent());
+
+    shuffle.setLayout("Status");
+    shuffle.setBoolean("Auto", !manualMode);
+    shuffle.setBoolean("Ready", canMakeSave);
   }
 
   public void estimateHitPoint() {
@@ -329,8 +333,7 @@ public class RobotContainer {
   public void makeSave() {
     if (!canMakeSave) return;
     if (velocityTracker.hasTarget()) {
-      if (velocityTracker.getSecondsToImpact() < Constants.Robot.secondsBeforeSave
-          && velocityTracker.getSecondsToImpact() > 0) {
+      if (velocityTracker.getSecondsToImpact() > 0) {
         canMakeSave = false;
         double[] hitPoint = velocityTracker.getHitPoint();
         if (hitPoint[1] > Constants.Robot.armActivationMinHeight) {
@@ -340,31 +343,37 @@ public class RobotContainer {
                     / (Constants.Robot.armActivationMaxHeight
                         - Constants.Robot.armActivationMinHeight));
             if (hitPoint[0] > Constants.Robot.width / 2) {
-              rightArm.moveFromRange(0, 1, armPercent);
+              rightArm.moveFromRange(0, 0.8, armPercent);
               leftLeg.moveToMidPosition();
-              drivebase.drive(new Translation2d(0, 0), 0, true);
+              System.out.println("Right Arm");
+              drivebase.drive(new Translation2d(0, Constants.Robot.SlideDistance), 0, true);
             } else if (hitPoint[0] < -Constants.Robot.width / 2) {
-              leftArm.moveFromRange(0, 1, armPercent);
+              leftArm.moveFromRange(0, 0.8, armPercent);
               rightLeg.moveToMidPosition();
-              drivebase.drive(new Translation2d(0, 0), 0, true);
+              System.out.println("Left Arm");
+              drivebase.drive(new Translation2d(0, -Constants.Robot.SlideDistance), 0, true);
             } else {
-              // torso
+              System.out.println("Torso");
             }
           } else {
-            // too high
+            System.out.println("Too High");
           }
         } else {
           if (hitPoint[0] > Constants.Robot.width / 2) {
             rightLeg.moveToDownPosition();
+            System.out.println("Right Leg");
           } else if (hitPoint[0] < -Constants.Robot.width / 2) {
             leftLeg.moveToDownPosition();
+            System.out.println("Left Leg");
           } else {
             rightLeg.moveToDownPosition();
             leftLeg.moveToDownPosition();
+            System.out.println("Both Legs");
           }
         }
+        System.out.println(String.format("Hitpoint: %2d, %2d", hitPoint[0], hitPoint[1]));
       } else {
-        System.out.println("has target");
+        System.out.println("Has Target");
       }
     }
   }
@@ -372,8 +381,7 @@ public class RobotContainer {
   public void estimateSave() {
     if (!canMakeSave) return;
     if (velocityTracker.hasTarget()) {
-      if (velocityTracker.getSecondsToImpact() < Constants.Robot.secondsBeforeSave
-          && velocityTracker.getSecondsToImpact() > 0) {
+      if (velocityTracker.getSecondsToImpact() > 0) {
         canMakeSave = false;
         double[] hitPoint = velocityTracker.getHitPoint();
         if (hitPoint[0] > Constants.Robot.width / 2) {
@@ -404,8 +412,7 @@ public class RobotContainer {
 
   public void countFrames() {
     if (velocityTracker.hasTarget()) {
-      if (velocityTracker.getSecondsToImpact() < Constants.Robot.secondsBeforeSave
-          && velocityTracker.getSecondsToImpact() > 0) {
+      if (velocityTracker.getSecondsToImpact() > 0) {
         System.out.println(velocityTracker.getSecondsToImpact());
       } else {
         System.out.println("hasTarget");

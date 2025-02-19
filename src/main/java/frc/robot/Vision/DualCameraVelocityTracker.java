@@ -1,6 +1,7 @@
 package frc.robot.Vision;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import java.util.ArrayList;
 
 public class DualCameraVelocityTracker extends SubsystemBase {
@@ -20,7 +21,7 @@ public class DualCameraVelocityTracker extends SubsystemBase {
   private final double c1RightTilt;
   private final double c2RightTilt;
 
-  private final double frameRate = 144;
+  private final double frameRate = 120;
   private final double minFrames = 10; // minimum frames needed to determine average velocities
 
   private ArrayList<double[]> positions = new ArrayList<>();
@@ -211,7 +212,12 @@ public class DualCameraVelocityTracker extends SubsystemBase {
     double[] hitPoint = new double[2];
     double secondsToImpact = getSecondsToImpact();
     hitPoint[0] = getTargetXPosition() + (getRecentAverageHorizontalVelocity() * secondsToImpact);
-    hitPoint[1] = getTargetYPosition() + (getRecentAverageVerticalVelocity() * secondsToImpact);
+    // hitPoint[1] = getTargetYPosition() + (getRecentAverageVerticalVelocity() * secondsToImpact)
+    //     - (Constants.Robot.GravityEffect * secondsToImpact);
+    hitPoint[1] =
+        getTargetYPosition()
+            + (getRecentAverageVerticalVelocity() * secondsToImpact)
+            - (Constants.Robot.GravityEffect * secondsToImpact * secondsToImpact / 2);
     return hitPoint;
   }
 
