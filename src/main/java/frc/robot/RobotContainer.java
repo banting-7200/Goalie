@@ -282,29 +282,53 @@ public class RobotContainer {
   }
 
   public void updateShuffle() {
-    shuffle.setTab("Status");
+    shuffle.setTab("Goalia");
 
-    shuffle.setLayout("Left Leg", 1, 2);
+    shuffle.setLayout("Left Leg", 1, 3);
     shuffle.setBoolean("Left Leg Up", leftLeg.isUp());
     shuffle.setBoolean("Left Leg Locked", leftLeg.isEnabled());
+    shuffle.setNumber("Left Leg Current", leftLeg.getCurrent());
 
-    shuffle.setLayout("Right Leg", 1, 2);
+    shuffle.setLayout("Right Leg", 1, 3);
     shuffle.setBoolean("Right Leg Up", rightLeg.isUp());
     shuffle.setBoolean("Right Leg Locked", rightLeg.isEnabled());
+    shuffle.setNumber("Right Leg Current", rightLeg.getCurrent());
 
-    shuffle.setLayout("Left Arm", 1, 2);
+    shuffle.setLayout("Left Arm", 1, 3);
     shuffle.setNumber("Left Arm Position", leftArm.getPosition());
     shuffle.setBoolean("Left Arm Enabled", leftArm.isEnabled());
     shuffle.setNumber("Left Arm Current", leftArm.getCurrent());
 
-    shuffle.setLayout("Right Arm", 1, 2);
+    shuffle.setLayout("Right Arm", 1, 3);
     shuffle.setNumber("Right Arm Position", rightArm.getPosition());
     shuffle.setBoolean("Right Arm Enabled", rightArm.isEnabled());
     shuffle.setNumber("Right Arm Current", rightArm.getCurrent());
 
-    shuffle.setLayout("Status");
+    shuffle.setLayout("Head", 1, 2);
+    shuffle.setBoolean("Enabled", head.isEnabled());
+    shuffle.setNumber("Position", head.getCurrentPosition());
+
+    shuffle.setLayout("Status", 1, 2);
     shuffle.setBoolean("Auto", !manualMode);
     shuffle.setBoolean("Ready", canMakeSave);
+
+    if (velocityTracker.hasTarget()) {
+      shuffle.setLayout("Puck Pose", 1, 3);
+      shuffle.setNumber("Puck X", velocityTracker.getTargetXPosition());
+      shuffle.setNumber("Puck Y", velocityTracker.getTargetYPosition());
+      shuffle.setNumber("Puck Distance", velocityTracker.getDistance());
+
+      shuffle.setLayout("Puck Velocity", 1, 3);
+      shuffle.setNumber("Puck Horizontal", velocityTracker.getRecentAverageHorizontalVelocity());
+      shuffle.setNumber("Puck Vertical", velocityTracker.getAverageVerticalVelocity());
+      shuffle.setNumber("Puck Incoming", velocityTracker.getAverageIncomingVelocity());
+
+      shuffle.setLayout("Puck Hitpoint", 1, 3);
+      shuffle.setNumber("Seconds To Impact", velocityTracker.getSecondsToImpact());
+      double[] hitpoint = velocityTracker.getHitPoint();
+      shuffle.setNumber("Hitpoint X", hitpoint[0]);
+      shuffle.setNumber("Hitpoint Y", hitpoint[1]);
+    }
   }
 
   public void estimateHitPoint() {
@@ -327,7 +351,7 @@ public class RobotContainer {
     rightArm.moveToDownPosition();
     leftLeg.moveToUpPosition();
     rightLeg.moveToUpPosition();
-    // alignToNet();
+    alignToNet();
   }
 
   public void makeSave() {

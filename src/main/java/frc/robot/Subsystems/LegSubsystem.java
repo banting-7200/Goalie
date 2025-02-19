@@ -149,4 +149,8 @@ public class LegSubsystem extends SubsystemBase {
     PIDController.setI(PID[1]);
     PIDController.setD(PID[2]);
   }
+
+  public double getCurrent() {
+    return motor.getOutputCurrent();
+  }
 }
