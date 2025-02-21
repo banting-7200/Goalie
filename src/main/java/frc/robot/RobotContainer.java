@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Commands.DriveHorizontalCommand;
 import frc.robot.Commands.NetAlignCommand;
 import frc.robot.Constants.*;
@@ -51,7 +50,7 @@ public class RobotContainer {
 
   public boolean canMakeSave = false;
 
-  private boolean manualMode = false;
+  private boolean manualMode = true;
 
   private EventLoop manualLoop = new EventLoop();
   private EventLoop autoLoop = new EventLoop();
@@ -64,8 +63,6 @@ public class RobotContainer {
   public double secondsBeforeSave;
 
   Command driveFieldOrientedDirectAngle;
-
-  public CommandScheduler scheduler = CommandScheduler.getInstance();
 
   public RobotContainer() {
     shuffle.setTab("Status");
@@ -183,14 +180,16 @@ public class RobotContainer {
         new BooleanEvent(
             enabledLoop, () -> buttonBox.getRawButton(Control.Support.enableMotorsSwitch));
 
-    toggleSafeMode.ifHigh(
-        () -> {
-          rightLeg.setEnabled(true);
-          leftLeg.setEnabled(true);
-          rightArm.setEnabled(true);
-          leftArm.setEnabled(true);
-          head.enableMovement(true);
-        });
+    toggleSafeMode
+        .rising()
+        .ifHigh(
+            () -> {
+              rightLeg.setEnabled(true);
+              leftLeg.setEnabled(true);
+              rightArm.setEnabled(true);
+              leftArm.setEnabled(true);
+              head.enableMovement(true);
+            });
     toggleSafeMode
         .negate()
         .ifHigh(
@@ -217,8 +216,8 @@ public class RobotContainer {
         new BooleanEvent(
             enabledLoop, () -> buttonBox.getRawButton(Control.Support.manualModeSwitch));
 
-    setRobotMode.ifHigh(() -> setManualMode(false));
-    setRobotMode.negate().ifHigh(() -> setManualMode(true));
+    setRobotMode.rising().ifHigh(() -> setManualMode(false));
+    setRobotMode.negate().rising().ifHigh(() -> setManualMode(true));
 
     // ----------------------XboxController--------------------------------
 
@@ -232,23 +231,24 @@ public class RobotContainer {
         new BooleanEvent(
             enabledLoop, () -> driveController.getRawButton(Control.Main.zeroGyroButton));
     zeroGyro.rising().ifHigh(() -> drivebase.zeroGyro());
-    if (!manualMode) drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
+    drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
   }
 
   // --------------------------------------------------------------------------
 
   public void setManualMode(boolean manualMode) {
+    canMakeSave = false;
     this.manualMode = manualMode;
   }
 
   public void periodic() {
     updateShuffle();
     updateTests();
-    lights.rainbow();
+    // lights.rainbow();
   }
 
   public void enabledPeriodic() {
-    lights.run();
+    // lights.run();
     head.run();
     leftLeg.run();
     rightLeg.run();
@@ -261,9 +261,9 @@ public class RobotContainer {
       rightArm.moveFromRange(-1, 1, buttonBox.getY());
       manualLoop.poll();
     } else {
-      // autoLoop.poll();
+      autoLoop.poll();
       // estimateSave();
-      // makeSave();
+      makeSave();
     }
   }
 
