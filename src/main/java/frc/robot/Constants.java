@@ -125,20 +125,26 @@ public final class Constants {
     public final class Main {
       public static final int controllerPort = 0;
       public static final int zeroGyroButton = XboxController.Button.kA.value;
-      public static final int leftLegToggleButton = XboxController.Button.kX.value;
-      public static final int rightLegToggleButton = XboxController.Button.kB.value;
-      public static final int enableButton = XboxController.Button.kY.value;
+
       public static final int leftArmChannel = XboxController.Axis.kLeftY.value;
       public static final int rightArmChannel = XboxController.Axis.kRightY.value;
-      public static final int clearCameraDataButton = XboxController.Button.kLeftBumper.value;
+
       public static final int switchTestModeButton = XboxController.Button.kRightBumper.value;
-      public static final int toggleHeadButton = 8;
-      public static final int zeroHeadButton = XboxController.Button.kBack.value;
     }
 
     public final class Support {
       public static final int port = 1;
-      public static final int modeToggle = 2;
+      public static final int zeroHeadButton = 1;
+      public static final int danceButton = 2;
+      public static final int waveButton = 3;
+      public static final int clearCameraDataButton = 4;
+      public static final int toggleHeadButton = 5;
+      public static final int rightLegToggleButton = 6;
+      public static final int leftLegToggleButton = 7;
+      public static final int enableAutoSaveButton = 8;
+      public static final int enableMotorsSwitch = 9;
+      public static final int manualModeSwitch = 10;
+      public static final int invertButtonBoxSwitch = 11;
     }
   }
 

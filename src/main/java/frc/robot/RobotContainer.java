@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.XboxController;
@@ -24,7 +25,7 @@ import org.photonvision.PhotonCamera;
 public class RobotContainer {
 
   XboxController driveController = new XboxController(Constants.Control.Main.controllerPort);
-  // Joystick buttonBox = new Joystick(Constants.Control.Support.port);
+  Joystick buttonBox = new Joystick(Constants.Control.Support.port);
 
   public LegSubsystem leftLeg;
   public LegSubsystem rightLeg;
@@ -136,56 +137,13 @@ public class RobotContainer {
             Constants.DeviceIDs.headLowerLimit,
             Constants.DeviceIDs.headUpperLimit);
 
-    lights = new LightsSubsystem(Constants.DeviceIDs.lights, 59);
+    lights = new LightsSubsystem(Constants.DeviceIDs.lights, 1);
 
     configureBindings();
   }
 
   private void configureBindings() {
     shuffle.setPID("PID Tuner", Arms.RightPID.P, Arms.RightPID.I, Arms.RightPID.D);
-
-    BooleanEvent toggleLeftLeg =
-        new BooleanEvent(
-            manualLoop, () -> driveController.getRawButton(Control.Main.leftLegToggleButton));
-    toggleLeftLeg.rising().ifHigh(() -> leftLeg.togglePosition());
-
-    BooleanEvent toggleRightLeg =
-        new BooleanEvent(
-            manualLoop, () -> driveController.getRawButton(Control.Main.rightLegToggleButton));
-    toggleRightLeg.rising().ifHigh(() -> rightLeg.togglePosition());
-
-    BooleanEvent toggleHead =
-        new BooleanEvent(
-            manualLoop, () -> driveController.getRawButton(Control.Main.toggleHeadButton));
-    toggleHead.rising().ifHigh(() -> head.toggleHead());
-
-    BooleanEvent zeroHead =
-        new BooleanEvent(
-            manualLoop, () -> driveController.getRawButton(Control.Main.zeroHeadButton));
-    zeroHead.rising().ifHigh(() -> head.zeroEncoder());
-
-    // Comment toggleRightArm if using joystick to control
-    // BooleanEvent toggleRightArm = new BooleanEvent(manualLoop, () ->
-    // driveController.getBButton());
-
-    // toggleRightArm.rising().ifHigh(() -> rightArm.toggleArmPosition());
-    // toggleRightArm.rising().ifHigh(() -> rightArm.toggleArmPosition());
-
-    BooleanEvent toggleSafeMode =
-        new BooleanEvent(
-            enabledLoop, () -> driveController.getRawButton(Control.Main.enableButton));
-
-    toggleSafeMode
-        .rising()
-        .ifHigh(
-            () -> {
-              rightLeg.setEnabled(!rightLeg.isEnabled());
-              leftLeg.setEnabled(!leftLeg.isEnabled());
-              rightArm.setEnabled(!rightArm.isEnabled());
-              leftArm.setEnabled(!leftArm.isEnabled());
-              head.enableMovement(!head.isEnabled());
-            });
-
     // BooleanEvent updatePIDs =
     //     new BooleanEvent(manualLoop, () ->
     // driveController.getRawButton(Control.Main.updatePIDsButton));
@@ -200,38 +158,93 @@ public class RobotContainer {
     //           System.out.println("UPDATING PIDS");
     //         });
 
+    // ----------------------ButtonBox-----------------------------------
+
+    BooleanEvent toggleLeftLeg =
+        new BooleanEvent(
+            manualLoop, () -> buttonBox.getRawButton(Control.Support.leftLegToggleButton));
+    toggleLeftLeg.rising().ifHigh(() -> leftLeg.togglePosition());
+
+    BooleanEvent toggleRightLeg =
+        new BooleanEvent(
+            manualLoop, () -> buttonBox.getRawButton(Control.Support.rightLegToggleButton));
+    toggleRightLeg.rising().ifHigh(() -> rightLeg.togglePosition());
+
+    BooleanEvent toggleHead =
+        new BooleanEvent(
+            manualLoop, () -> buttonBox.getRawButton(Control.Support.toggleHeadButton));
+    toggleHead.rising().ifHigh(() -> head.toggleHead());
+
+    BooleanEvent zeroHead =
+        new BooleanEvent(manualLoop, () -> buttonBox.getRawButton(Control.Support.zeroHeadButton));
+    zeroHead.rising().ifHigh(() -> head.zeroEncoder());
+
+    BooleanEvent toggleSafeMode =
+        new BooleanEvent(
+            enabledLoop, () -> buttonBox.getRawButton(Control.Support.enableMotorsSwitch));
+
+    toggleSafeMode.ifHigh(
+        () -> {
+          rightLeg.setEnabled(true);
+          leftLeg.setEnabled(true);
+          rightArm.setEnabled(true);
+          leftArm.setEnabled(true);
+          head.enableMovement(true);
+        });
+    toggleSafeMode
+        .negate()
+        .ifHigh(
+            () -> {
+              rightLeg.setEnabled(false);
+              leftLeg.setEnabled(false);
+              rightArm.setEnabled(false);
+              leftArm.setEnabled(false);
+              head.enableMovement(false);
+            });
+
+    BooleanEvent clearCameraData =
+        new BooleanEvent(
+            manualLoop, () -> buttonBox.getRawButton(Control.Support.clearCameraDataButton));
+
+    clearCameraData.rising().ifHigh(() -> velocityTracker.reset());
+
+    BooleanEvent resetBot =
+        new BooleanEvent(
+            autoLoop, () -> buttonBox.getRawButton(Control.Support.clearCameraDataButton));
+    resetBot.rising().ifHigh(() -> reset());
+
+    BooleanEvent setRobotMode =
+        new BooleanEvent(
+            enabledLoop, () -> buttonBox.getRawButton(Control.Support.manualModeSwitch));
+
+    setRobotMode.ifHigh(() -> setManualMode(false));
+    setRobotMode.negate().ifHigh(() -> setManualMode(true));
+
+    // ----------------------XboxController--------------------------------
+
     BooleanEvent switchTestMode =
         new BooleanEvent(
             manualLoop, () -> driveController.getRawButton(Control.Main.switchTestModeButton));
 
     switchTestMode.rising().ifHigh(() -> testMode++);
 
-    BooleanEvent clearCameraData =
-        new BooleanEvent(
-            manualLoop, () -> driveController.getRawButton(Control.Main.clearCameraDataButton));
-
-    clearCameraData.rising().ifHigh(() -> velocityTracker.reset());
-
     BooleanEvent zeroGyro =
         new BooleanEvent(
             enabledLoop, () -> driveController.getRawButton(Control.Main.zeroGyroButton));
-
-    BooleanEvent resetBot =
-        new BooleanEvent(
-            autoLoop, () -> driveController.getRawButton(Control.Main.clearCameraDataButton));
-    resetBot.rising().ifHigh(() -> reset());
-
-    // BooleanEvent toggleMode =
-    //     new BooleanEvent(enabledLoop, () -> buttonBox.getRawButton(Control.Support.modeToggle));
-    // toggleMode.rising().ifHigh(() -> manualMode = !manualMode);
-
     zeroGyro.rising().ifHigh(() -> drivebase.zeroGyro());
     if (!manualMode) drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
+  }
+
+  // --------------------------------------------------------------------------
+
+  public void setManualMode(boolean manualMode) {
+    this.manualMode = manualMode;
   }
 
   public void periodic() {
     updateShuffle();
     updateTests();
+    lights.rainbow();
   }
 
   public void enabledPeriodic() {
@@ -243,13 +256,14 @@ public class RobotContainer {
     rightArm.run();
     enabledLoop.poll();
     if (manualMode) {
-      // leftArm.moveFromRange(-1, 1, driveController.getLeftY());
-      // rightArm.moveFromRange(-1, 1, driveController.getRightY());
+      // head.setHeadPosition(-1, 1, buttonBox.getZ());
+      leftArm.moveFromRange(-1, 1, buttonBox.getX());
+      rightArm.moveFromRange(-1, 1, buttonBox.getY());
       manualLoop.poll();
     } else {
-      autoLoop.poll();
+      // autoLoop.poll();
       // estimateSave();
-      makeSave();
+      // makeSave();
     }
   }
 

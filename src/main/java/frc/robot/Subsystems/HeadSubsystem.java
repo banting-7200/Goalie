@@ -64,6 +64,15 @@ public class HeadSubsystem {
     }
   }
 
+  public void setHeadPosition(double rangeMin, double rangeMax, double input) {
+    double position =
+        (input - rangeMin)
+                / (rangeMax - rangeMin)
+                * (Head.Positions.maxPosition - Head.Positions.minPosition)
+            + Head.Positions.minPosition;
+    setPoint = position;
+  }
+
   public double getCurrentPosition() {
     currentPosition = headMotor.getSelectedSensorPosition();
     return headMotor.getSelectedSensorPosition();

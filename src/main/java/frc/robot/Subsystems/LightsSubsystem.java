@@ -23,7 +23,13 @@ public class LightsSubsystem {
     ledInstance.setData(bufferInstance);
   }
 
-  void blinkingSolidColor(int red, int green, int blue, double blinkRate) {
+  public void solidColor(int red, int green, int blue) {
+    for (int x = 0; x < bufferInstance.getLength(); x++) {
+      bufferInstance.setRGB(x, red, green, blue);
+    }
+  }
+
+  public void blinkingSolidColor(int red, int green, int blue, double blinkRate) {
 
     if (currentTime - previousTime > blinkRate) {
       if (!areLightsOn) {
@@ -41,7 +47,7 @@ public class LightsSubsystem {
     }
   }
 
-  void rainbow() {
+  public void rainbow() {
     for (var i = 0; i < bufferInstance.getLength(); i++) {
       int hue = (rainbowFirstPixelHue + (i * 180 / bufferInstance.getLength())) % 180;
       bufferInstance.setHSV(i, hue, 255, 128);
@@ -51,7 +57,7 @@ public class LightsSubsystem {
     rainbowFirstPixelHue %= 180;
   }
 
-  void off() {
+  public void off() {
     for (int i = 0; i < bufferInstance.getLength(); i++) {
       bufferInstance.setLED(i, Color.kBlack);
     }
