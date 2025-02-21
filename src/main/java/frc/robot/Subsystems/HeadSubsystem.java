@@ -51,7 +51,7 @@ public class HeadSubsystem {
     if (lowerLimitSwitch.get() && upperLimitSwitch.get()) {
       return true;
     }
-    System.out.println("Limits hit: " + lowerLimitSwitch.get() + " | " + upperLimitSwitch.get());
+    // System.out.println("Limits hit: " + lowerLimitSwitch.get() + " | " + upperLimitSwitch.get());
     return false;
   }
 

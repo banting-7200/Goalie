@@ -208,8 +208,9 @@ public class DualCameraVelocityTracker extends SubsystemBase {
   }
 
   public double[] getHitPoint() {
-    if (velocities.size() < minFrames) return null;
     double[] hitPoint = new double[2];
+    if (velocities.size() < minFrames) return hitPoint;
+
     double secondsToImpact = getSecondsToImpact();
     hitPoint[0] = getTargetXPosition() + (getRecentAverageHorizontalVelocity() * secondsToImpact);
     // hitPoint[1] = getTargetYPosition() + (getRecentAverageVerticalVelocity() * secondsToImpact)

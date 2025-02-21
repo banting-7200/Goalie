@@ -2,8 +2,9 @@ package frc.robot.Vision;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class PhotonVisionCamera {
+public class PhotonVisionCamera extends SubsystemBase {
   private NetworkTable table;
 
   public PhotonVisionCamera(String cameraName) {

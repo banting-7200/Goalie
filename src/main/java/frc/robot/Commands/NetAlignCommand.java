@@ -13,24 +13,19 @@ public class NetAlignCommand extends Command {
   private double tagYaw;
   private double tagPitch;
 
-  private double speed;
-
-  private boolean tagDetected;
+  private double speed = 0.01;
 
   public NetAlignCommand(SwerveSubsystem swerve, PhotonVisionCamera camera) {
     this.camera = camera;
     this.swerve = swerve;
+    addRequirements(swerve, camera);
   }
 
   @Override
   public void execute() {
     getTagData();
-    if (tagDetected) {
-      if (getXtranslation() == 0 && getYtranslation() == 0 && getRotation() == 0) end(false);
-      swerve.drive(new Translation2d(getXtranslation(), getYtranslation()), getRotation(), false);
-    } else {
-      end(false);
-    }
+    System.out.println("Running");
+    swerve.drive(new Translation2d(getXtranslation(), getYtranslation()), getRotation(), false);
   }
 
   private double getXtranslation() {
@@ -54,16 +49,21 @@ public class NetAlignCommand extends Command {
   private void getTagData() {
     tagYaw = camera.getTargetYaw();
     tagPitch = camera.getTargetPitch();
-    tagDetected = camera.hasTarget();
   }
 
   @Override
   public boolean isFinished() {
-    return false;
+    getTagData();
+    if (!camera.hasTarget()) {
+      System.out.println("No Target");
+      return true;
+    }
+    return (getXtranslation() == 0 && getYtranslation() == 0 && getRotation() == 0);
   }
 
   @Override
   public void end(boolean interrupted) {
-    swerve.drive(new Translation2d(0, 0), getRotation(), false);
+    System.out.println("Done Aligning");
+    // swerve.drive(new Translation2d(0, 0), getRotation(), false);
   }
 }

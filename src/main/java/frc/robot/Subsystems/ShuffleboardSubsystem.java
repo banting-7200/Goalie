@@ -56,6 +56,7 @@ public class ShuffleboardSubsystem extends SubsystemBase {
 
   public void setNumber(
       String name, double value) { // creates or sets a double on the shuffleboard.
+    // value = Double.parseDouble(String.format("%.2f", value));
     GenericEntry entry;
     int index = entryNames.indexOf(name);
     if (index == -1) { // If this entry does not exist

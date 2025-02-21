@@ -18,14 +18,15 @@ import edu.wpi.first.wpilibj.XboxController;
 public final class Constants {
 
   public final class Robot {
-    public static final double width = 0.05; // metres
+    public static final double width = 0.1; // metres
     // public static final double height = .45; // metres
     public static final double armActivationMinHeight =
-        0.45; // metres from position on robot camera positions are based on
+        0.40; // metres from position on robot camera positions are based on
     public static final double armActivationMaxHeight =
-        0.85; // metres from position on robot camera positions are based on
+        1.10; // metres from position on robot camera positions are based on
     public static final double SlideDistance = 0.2;
-    public static final double GravityEffect = 0.98;
+    public static final double GravityEffect = 0.1;
+    public static final double secondsBeforeSave = 2.0;
   }
 
   public final class Legs {
@@ -113,6 +114,10 @@ public final class Constants {
       public static final double yOffset = -.13;
       public static final double upTilt = 15;
       public static final double rightTilt = 0;
+    }
+
+    public final class BackCamera {
+      public static final String address = "BackCamera";
     }
   }
 

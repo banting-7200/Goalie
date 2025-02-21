@@ -5,7 +5,6 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
@@ -13,9 +12,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Commands.DriveHorizontalCommand;
 import frc.robot.Commands.NetAlignCommand;
 import frc.robot.Constants.*;
-import frc.robot.Constants.Vision;
 import frc.robot.Subsystems.*;
 import frc.robot.Vision.*;
 import java.io.File;
@@ -64,6 +64,8 @@ public class RobotContainer {
 
   Command driveFieldOrientedDirectAngle;
 
+  public CommandScheduler scheduler = CommandScheduler.getInstance();
+
   public RobotContainer() {
     shuffle.setTab("Status");
     leftLeg =
@@ -104,6 +106,7 @@ public class RobotContainer {
 
     upperCamera = new PhotonVisionCamera(Constants.Vision.UpperCamera.address);
     lowerCamera = new PhotonVisionCamera(Constants.Vision.LowerCamera.address);
+    backCamera = new PhotonVisionCamera(Constants.Vision.BackCamera.address);
 
     velocityTracker =
         new DualCameraVelocityTracker(
@@ -245,6 +248,7 @@ public class RobotContainer {
       manualLoop.poll();
     } else {
       autoLoop.poll();
+      // estimateSave();
       makeSave();
     }
   }
@@ -312,6 +316,11 @@ public class RobotContainer {
     shuffle.setBoolean("Auto", !manualMode);
     shuffle.setBoolean("Ready", canMakeSave);
 
+    shuffle.setLayout("Cameras");
+    shuffle.setBoolean("Upper Camera Has Target", upperCamera.hasTarget());
+    shuffle.setBoolean("Lower Camera Has Target", lowerCamera.hasTarget());
+    shuffle.setBoolean("Back Camera Has Target", backCamera.hasTarget());
+
     if (velocityTracker.hasTarget()) {
       shuffle.setLayout("Puck Pose", 1, 3);
       shuffle.setNumber("Puck X", velocityTracker.getTargetXPosition());
@@ -334,7 +343,7 @@ public class RobotContainer {
   public void estimateHitPoint() {
     if (!velocityTracker.hasTarget()) return;
     double[] hitPoint = velocityTracker.getHitPoint();
-    if (hitPoint == null) {
+    if (hitPoint == new double[2]) {
       System.out.println("hasTarget");
     } else {
       System.out.println(
@@ -345,19 +354,22 @@ public class RobotContainer {
   }
 
   public void reset() {
+    new NetAlignCommand(drivebase, backCamera).schedule();
+    //         () -> {
     canMakeSave = true;
     velocityTracker.reset();
     leftArm.moveToDownPosition();
     rightArm.moveToDownPosition();
     leftLeg.moveToUpPosition();
     rightLeg.moveToUpPosition();
-    alignToNet();
+    //          });
   }
 
   public void makeSave() {
     if (!canMakeSave) return;
     if (velocityTracker.hasTarget()) {
-      if (velocityTracker.getSecondsToImpact() > 0) {
+      if (velocityTracker.getSecondsToImpact() < Constants.Robot.secondsBeforeSave
+          && velocityTracker.getSecondsToImpact() > 0) {
         canMakeSave = false;
         double[] hitPoint = velocityTracker.getHitPoint();
         if (hitPoint[1] > Constants.Robot.armActivationMinHeight) {
@@ -370,12 +382,12 @@ public class RobotContainer {
               rightArm.moveFromRange(0, 0.8, armPercent);
               leftLeg.moveToMidPosition();
               System.out.println("Right Arm");
-              drivebase.drive(new Translation2d(0, Constants.Robot.SlideDistance), 0, true);
+              new DriveHorizontalCommand(drivebase, Constants.Robot.SlideDistance).schedule();
             } else if (hitPoint[0] < -Constants.Robot.width / 2) {
               leftArm.moveFromRange(0, 0.8, armPercent);
               rightLeg.moveToMidPosition();
               System.out.println("Left Arm");
-              drivebase.drive(new Translation2d(0, -Constants.Robot.SlideDistance), 0, true);
+              new DriveHorizontalCommand(drivebase, -Constants.Robot.SlideDistance).schedule();
             } else {
               System.out.println("Torso");
             }
@@ -386,18 +398,21 @@ public class RobotContainer {
           if (hitPoint[0] > Constants.Robot.width / 2) {
             rightLeg.moveToDownPosition();
             System.out.println("Right Leg");
+            new DriveHorizontalCommand(drivebase, Constants.Robot.SlideDistance).schedule();
           } else if (hitPoint[0] < -Constants.Robot.width / 2) {
             leftLeg.moveToDownPosition();
             System.out.println("Left Leg");
+            new DriveHorizontalCommand(drivebase, -Constants.Robot.SlideDistance).schedule();
+
           } else {
             rightLeg.moveToDownPosition();
             leftLeg.moveToDownPosition();
             System.out.println("Both Legs");
           }
         }
-        System.out.println(String.format("Hitpoint: %2d, %2d", hitPoint[0], hitPoint[1]));
+        System.out.println(String.format("Hitpoint: %2f, %2f", hitPoint[0], hitPoint[1]));
       } else {
-        System.out.println("Has Target");
+        System.out.println("Has Target " + velocityTracker.getSecondsToImpact());
       }
     }
   }
@@ -405,7 +420,8 @@ public class RobotContainer {
   public void estimateSave() {
     if (!canMakeSave) return;
     if (velocityTracker.hasTarget()) {
-      if (velocityTracker.getSecondsToImpact() > 0) {
+      if (velocityTracker.getSecondsToImpact() < Constants.Robot.secondsBeforeSave
+          && velocityTracker.getSecondsToImpact() > 0) {
         canMakeSave = false;
         double[] hitPoint = velocityTracker.getHitPoint();
         if (hitPoint[0] > Constants.Robot.width / 2) {
@@ -428,23 +444,21 @@ public class RobotContainer {
         } else {
           System.out.println("leg");
         }
+        System.out.println(String.format("Hitpoint: %2f, %2f", hitPoint[0], hitPoint[1]));
       } else {
-        System.out.println("has target");
+        System.out.println("Has Target");
       }
     }
   }
 
   public void countFrames() {
     if (velocityTracker.hasTarget()) {
-      if (velocityTracker.getSecondsToImpact() > 0) {
+      if (velocityTracker.getSecondsToImpact() < Constants.Robot.secondsBeforeSave
+          && velocityTracker.getSecondsToImpact() > 0) {
         System.out.println(velocityTracker.getSecondsToImpact());
       } else {
         System.out.println("hasTarget");
       }
     }
-  }
-
-  public void alignToNet() {
-    new NetAlignCommand(drivebase, backCamera);
   }
 }
