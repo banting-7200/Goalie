@@ -62,6 +62,7 @@ public class LegSubsystem extends SubsystemBase {
   }
 
   public void moveToUpPosition() {
+    isUp = true;
     setPosition(upPosition);
   }
 
@@ -70,6 +71,7 @@ public class LegSubsystem extends SubsystemBase {
   }
 
   public void moveToDownPosition() {
+    isUp = false;
     setPosition(downPosition);
   }
 

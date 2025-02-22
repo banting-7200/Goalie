@@ -29,8 +29,8 @@ public class NetAlignCommand extends Command {
   }
 
   private double getXtranslation() {
-    if (tagPitch < -11) return -speed;
-    if (tagPitch > -9) return speed;
+    if (tagPitch < -4) return -speed;
+    if (tagPitch > -3) return speed;
     return 0;
   }
 

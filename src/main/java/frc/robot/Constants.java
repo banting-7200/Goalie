@@ -20,11 +20,12 @@ public final class Constants {
   public final class Robot {
     public static final double width = 0.1; // metres
     // public static final double height = .45; // metres
-    public static final double armActivationMinHeight =
+    public static final double leftArmActivationMinHeight =
         0.40; // metres from position on robot camera positions are based on
+    public static final double rightArmActivationMinHeight = 0.50;
     public static final double armActivationMaxHeight =
         1.10; // metres from position on robot camera positions are based on
-    public static final double SlideDistance = 0.2;
+    public static final double SlideDistance = 0.1;
     public static final double GravityEffect = 0.1;
     public static final double secondsBeforeSave = 2.0;
   }

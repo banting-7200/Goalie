@@ -50,4 +50,8 @@ public class PhotonVisionCamera extends SubsystemBase {
   public double getTargetPixelsY() {
     return (double) table.getEntry("targetPixelsY").getNumber(-1);
   }
+
+  public double getLatency() {
+    return (double) table.getEntry("latencyMillis").getNumber(-1);
+  }
 }
