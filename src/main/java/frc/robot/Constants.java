@@ -19,15 +19,16 @@ public final class Constants {
 
   public final class Robot {
     public static final double width = 0.1; // metres
-    // public static final double height = .45; // metres
     public static final double leftArmActivationMinHeight =
-        0.40; // metres from position on robot camera positions are based on
-    public static final double rightArmActivationMinHeight = 0.50;
-    public static final double armActivationMaxHeight =
-        1.10; // metres from position on robot camera positions are based on
+        0.45; // metres from position on robot camera positions are based on
+    public static final double rightArmActivationMinHeight = 0.40;
+    public static final double rightArmActivationMaxHeight = 0.60;
+    public static final double leftArmActivationMaxHeight = 0.70;
+    public static final double armActivationMaxHeight = 0.60;
+    public static final double legActivationMaxHeight = 0.30;
     public static final double SlideDistance = 0.1;
     public static final double GravityEffect = 0.1;
-    public static final double secondsBeforeSave = 2.0;
+    public static final double secondsBeforeSave = 5.0;
   }
 
   public final class Legs {
@@ -62,9 +63,9 @@ public final class Constants {
   public final class Arms {
 
     public class RightPID {
-      public static final double P = 0.005;
+      public static final double P = 0.035;
       public static final double I = 0;
-      public static final double D = 0.001;
+      public static final double D = 0.004;
     }
 
     public class LeftPID {
@@ -74,18 +75,18 @@ public final class Constants {
     }
 
     public class Positions {
-      public static final double leftMaxPosition = 185; // 217
-      public static final double leftMinPosition = 140; // 171
+      public static final double leftMaxPosition = 155; // 217
+      public static final double leftMinPosition = 125; // 171
 
-      public static final double rightMaxPosition = 179; // 292
-      public static final double rightMinPosition = 135; // 232
+      public static final double rightMaxPosition = 188; // 292
+      public static final double rightMinPosition = 137; // 232
 
       public static final double upperStopRange = 1;
       public static final double lowerStopRange = 5;
     }
 
     public final class motorControllerConfigurations {
-      public static final int currentLimit = 20;
+      public static final int currentLimit = 40;
     }
   }
 
@@ -106,7 +107,7 @@ public final class Constants {
       public static final double xOffset = 0;
       public static final double yOffset = 0.89;
       public static final double upTilt = -5;
-      public static final double rightTilt = -3;
+      public static final double rightTilt = -4;
     }
 
     public final class LowerCamera {
@@ -114,7 +115,7 @@ public final class Constants {
       public static final double xOffset = 0;
       public static final double yOffset = -.13;
       public static final double upTilt = 15;
-      public static final double rightTilt = 0;
+      public static final double rightTilt = -1;
     }
 
     public final class BackCamera {

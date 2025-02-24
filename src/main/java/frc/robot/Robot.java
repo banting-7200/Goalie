@@ -22,6 +22,7 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
 
   public Robot() {
+    addPeriodic(() -> m_robotContainer.criticalPeriodic(), 0.005, 0.0025);
     instance = this;
   }
 

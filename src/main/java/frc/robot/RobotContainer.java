@@ -249,6 +249,18 @@ public class RobotContainer {
     // updateTests();
     // lights.rainbow();
     // lights.run();
+
+  }
+
+  public void criticalPeriodic() {
+    if (!manualMode) {
+      makeSave();
+    }
+    leftLeg.run();
+    rightLeg.run();
+    leftArm.run();
+    rightArm.run();
+    head.run();
   }
 
   public void enabledPeriodic() {
@@ -257,13 +269,8 @@ public class RobotContainer {
       rightArm.moveFromRange(-1, 1, buttonBox.getY());
       manualLoop.poll();
     } else {
-      makeSave();
       autoLoop.poll();
     }
-    leftLeg.run();
-    rightLeg.run();
-    leftArm.run();
-    rightArm.run();
     head.run();
     enabledLoop.poll();
   }
@@ -392,32 +399,23 @@ public class RobotContainer {
         canMakeSave = false;
         System.out.println("Tracker Latency: " + velocityTracker.getLatency());
         double[] hitPoint = velocityTracker.getHitPoint();
-        if (hitPoint[1] > Constants.Robot.leftArmActivationMinHeight) { // if not legs
+        if (hitPoint[1] > Constants.Robot.legActivationMaxHeight) { // if not legs
           if (hitPoint[1] < Constants.Robot.armActivationMaxHeight) { // if not above net
+            // arms
             if (hitPoint[0] > Constants.Robot.width / 2) { // if on right
               if (hitPoint[1]
                   > Constants.Robot.rightArmActivationMinHeight) { // if within arm range on right
-                double armPercent =
-                    ((hitPoint[1] - Constants.Robot.rightArmActivationMinHeight)
-                        / (Constants.Robot.armActivationMaxHeight
-                            - Constants.Robot.rightArmActivationMinHeight));
-                rightArm.moveFromRange(0, 0.8, armPercent);
-                leftLeg.moveToMidPosition();
-                System.out.println("Right Arm");
-                new DriveHorizontalCommand(drivebase, Constants.Robot.SlideDistance).schedule();
+                rightArmSave(hitPoint[1]);
               } else { // if in between arm and leg on right
-                rightArm.moveToDownPosition();
-                new DriveHorizontalCommand(drivebase, Constants.Robot.SlideDistance).schedule();
+                rightMiddleSave();
               }
             } else if (hitPoint[0] < -Constants.Robot.width / 2) { // if on left
-              double armPercent =
-                  ((hitPoint[1] - Constants.Robot.leftArmActivationMinHeight)
-                      / (Constants.Robot.armActivationMaxHeight
-                          - Constants.Robot.leftArmActivationMinHeight));
-              leftArm.moveFromRange(0, 0.8, armPercent);
-              rightLeg.moveToMidPosition();
-              System.out.println("Left Arm");
-              new DriveHorizontalCommand(drivebase, -Constants.Robot.SlideDistance).schedule();
+              if (hitPoint[1]
+                  > Constants.Robot.leftArmActivationMinHeight) { // if within arm range on right
+                leftArmSave(hitPoint[1]);
+              } else {
+                leftMiddleSave();
+              }
             } else { // if in middle
               System.out.println("Torso");
             }
@@ -426,18 +424,11 @@ public class RobotContainer {
           }
         } else { // if legs
           if (hitPoint[0] > Constants.Robot.width / 2) { // if on right
-            rightLeg.moveToDownPosition();
-            System.out.println("Right Leg");
-            new DriveHorizontalCommand(drivebase, Constants.Robot.SlideDistance).schedule();
+            rightLegSave();
           } else if (hitPoint[0] < -Constants.Robot.width / 2) { // if on left
-            leftLeg.moveToDownPosition();
-            System.out.println("Left Leg");
-            new DriveHorizontalCommand(drivebase, -Constants.Robot.SlideDistance).schedule();
-
+            leftLegSave();
           } else { // if in middle
-            rightLeg.moveToDownPosition();
-            leftLeg.moveToDownPosition();
-            System.out.println("Both Legs");
+            middleLegSave();
           }
         }
         System.out.println(String.format("Hitpoint: %2f, %2f", hitPoint[0], hitPoint[1]));
@@ -447,6 +438,64 @@ public class RobotContainer {
         System.out.println("Has Target " + velocityTracker.getSecondsToImpact());
       }
     }
+  }
+
+  public void leftLegSave() {
+    leftLeg.moveToDownPosition();
+    rightLeg.moveToMidPosition();
+    System.out.println("Left Leg");
+    new DriveHorizontalCommand(drivebase, -Constants.Robot.SlideDistance).schedule();
+  }
+
+  public void rightLegSave() {
+    rightLeg.moveToDownPosition();
+    leftLeg.moveToMidPosition();
+    System.out.println("Right Leg");
+    new DriveHorizontalCommand(drivebase, Constants.Robot.SlideDistance).schedule();
+  }
+
+  public void leftArmSave(double height) {
+    double armPercent =
+        ((height - Constants.Robot.leftArmActivationMinHeight)
+            / (Constants.Robot.leftArmActivationMaxHeight
+                - Constants.Robot.leftArmActivationMinHeight));
+    leftArm.moveFromRange(0, 0.8, armPercent);
+    rightLeg.moveToMidPosition();
+    System.out.println("Left Arm");
+    new DriveHorizontalCommand(drivebase, -Constants.Robot.SlideDistance).schedule();
+  }
+
+  public void rightArmSave(double height) {
+    double armPercent =
+        ((height - Constants.Robot.rightArmActivationMinHeight)
+            / (Constants.Robot.rightArmActivationMaxHeight
+                - Constants.Robot.rightArmActivationMinHeight));
+    rightArm.moveFromRange(0, 0.8, armPercent);
+    leftLeg.moveToMidPosition();
+    System.out.println("Right Arm");
+    new DriveHorizontalCommand(drivebase, Constants.Robot.SlideDistance).schedule();
+  }
+
+  public void rightMiddleSave() {
+    rightArm.moveToDownPosition();
+    rightLeg.moveToUpPosition();
+    leftLeg.moveToMidPosition();
+    new DriveHorizontalCommand(drivebase, 1.5 * Constants.Robot.SlideDistance).schedule();
+    System.out.println("Right Middle");
+  }
+
+  public void leftMiddleSave() {
+    rightArm.moveToDownPosition();
+    leftLeg.moveToUpPosition();
+    rightLeg.moveToMidPosition();
+    new DriveHorizontalCommand(drivebase, -1.5 * Constants.Robot.SlideDistance).schedule();
+    System.out.println("Left Middle");
+  }
+
+  public void middleLegSave() {
+    rightLeg.moveToDownPosition();
+    leftLeg.moveToDownPosition();
+    System.out.println("Both Legs");
   }
 
   // public void estimateSave() {
