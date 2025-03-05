@@ -134,7 +134,7 @@ public class RobotContainer {
             Constants.DeviceIDs.headLowerLimit,
             Constants.DeviceIDs.headUpperLimit);
 
-    lights = new LightsSubsystem(Constants.DeviceIDs.lights, 1);
+    lights = new LightsSubsystem(Constants.DeviceIDs.lights, 2);
 
     configureBindings();
   }
@@ -244,11 +244,11 @@ public class RobotContainer {
   public void periodic() {
     updateShuffle();
     updateTests();
-    // lights.rainbow();
+    lights.run();
+    lights.solidColor(255,0,0);
   }
 
   public void enabledPeriodic() {
-    // lights.run();
     head.run();
     leftLeg.run();
     rightLeg.run();
@@ -474,5 +474,13 @@ public class RobotContainer {
         System.out.println("hasTarget");
       }
     }
+  }
+
+  public void danceTime() {
+
+  }
+
+  public void wave() {
+    leftArm.moveToAngle(Constants.Arms.Positions.leftMaxPosition);
   }
 }
