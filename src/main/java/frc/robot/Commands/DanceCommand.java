@@ -1,0 +1,63 @@
+package frc.robot.Commands;
+
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.RobotContainer;
+import frc.robot.Subsystems.ArmSubsystem;
+import frc.robot.Subsystems.HeadSubsystem;
+import frc.robot.Subsystems.LegSubsystem;
+import frc.robot.Subsystems.LightsSubsystem;
+
+public class DanceCommand extends Command {
+
+  double danceTime = 10;
+  double position = 0;
+  double increase = 0.001;
+  double time = 0;
+
+  ArmSubsystem leftArm;
+  ArmSubsystem rightArm;
+  LegSubsystem leftLeg;
+  LegSubsystem rightLeg;
+  HeadSubsystem head;
+  LightsSubsystem lights;
+
+  public DanceCommand(RobotContainer robot) {
+    leftArm = robot.leftArm;
+    rightArm = robot.rightArm;
+    leftLeg = robot.leftLeg;
+    rightLeg = robot.rightLeg;
+    head = robot.head;
+    lights = robot.lights;
+  }
+
+  @Override
+  public void initialize() {
+    System.out.println("Starting Dance Command");
+  }
+
+  @Override
+  public void execute() {
+    position += increase;
+    time += 0.02;
+    if (Math.abs(position) > 1) {
+      increase *= -1;
+    }
+    leftArm.moveFromRange(-1, 1, position);
+    rightArm.moveFromRange(-1, 1, -position);
+    leftLeg.moveFromRange(-2, 1, -position);
+    rightArm.moveFromRange(-2, 1, position);
+  }
+
+  @Override
+  public boolean isFinished() {
+    return time > danceTime;
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    leftArm.moveToDownPosition();
+    rightArm.moveToDownPosition();
+    rightLeg.moveToUpPosition();
+    leftLeg.moveToUpPosition();
+  }
+}

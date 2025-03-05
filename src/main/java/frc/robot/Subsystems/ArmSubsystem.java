@@ -18,6 +18,8 @@ public class ArmSubsystem extends SubsystemBase {
   private double upPosition;
   private double downPosition;
 
+  private double upWavePosition = Arms.Positions.leftMaxPosition;
+
   private double upperStopRange = Arms.Positions.upperStopRange;
   private double lowerStopRange = Arms.Positions.lowerStopRange;
 
@@ -104,6 +106,16 @@ public class ArmSubsystem extends SubsystemBase {
 
     double position =
         (input - rangeMin) / (rangeMax - rangeMin) * (upPosition - downPosition) + downPosition;
+
+    moveToAngle(position);
+  }
+
+  public void moveFromRangeWave(double rangeMin, double rangeMax, double input) {
+    if (input > rangeMax) input = rangeMax;
+    if (input < rangeMin) input = rangeMin;
+
+    double position =
+        (input - rangeMin) / (rangeMax - rangeMin) * (upWavePosition - upPosition) + upPosition;
 
     moveToAngle(position);
   }

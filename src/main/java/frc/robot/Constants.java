@@ -23,11 +23,11 @@ public final class Constants {
         0.45; // metres from position on robot camera positions are based on
     public static final double rightArmActivationMinHeight = 0.40;
     public static final double rightArmActivationMaxHeight = 0.60;
-    public static final double leftArmActivationMaxHeight = 0.70;
+    public static final double leftArmActivationMaxHeight = 1.00;
     public static final double armActivationMaxHeight = 0.60;
     public static final double legActivationMaxHeight = 0.30;
     public static final double SlideDistance = 0.1;
-    public static final double GravityEffect = 0.1;
+    public static final double GravityEffect = 0.15;
     public static final double secondsBeforeSave = 5.0;
   }
 
@@ -75,14 +75,17 @@ public final class Constants {
     }
 
     public class Positions {
-      public static final double leftMaxPosition = 155; // 217
-      public static final double leftMinPosition = 125; // 171
+      public static final double leftMaxSavePosition = 155; // 217
+      public static final double leftMinSavePosition = 125; // 171
 
-      public static final double rightMaxPosition = 188; // 292
-      public static final double rightMinPosition = 137; // 232
+      public static final double rightMaxSavePosition = 188; // 292
+      public static final double rightMinSavePosition = 137; // 232
 
       public static final double upperStopRange = 1;
       public static final double lowerStopRange = 5;
+
+      public static final double leftMaxPosition = 170;
+      public static final double leftMinPosition = 125;
     }
 
     public final class motorControllerConfigurations {

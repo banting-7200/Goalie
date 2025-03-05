@@ -75,6 +75,16 @@ public class LegSubsystem extends SubsystemBase {
     setPosition(downPosition);
   }
 
+  public void moveFromRange(double rangeMin, double rangeMax, double input) {
+    if (input > rangeMax) input = rangeMax;
+    if (input < rangeMin) input = rangeMin;
+
+    double position =
+        (input - rangeMin) / (rangeMax - rangeMin) * (upPosition - downPosition) + downPosition;
+
+    setPosition(position);
+  }
+
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
   }

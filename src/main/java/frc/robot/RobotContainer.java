@@ -14,9 +14,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Commands.DanceCommand;
 import frc.robot.Commands.DriveHorizontalCommand;
-import frc.robot.Commands.EmptyCommand;
 import frc.robot.Commands.NetAlignCommand;
+import frc.robot.Commands.WaveCommand;
 import frc.robot.Constants.*;
 import frc.robot.Subsystems.*;
 import frc.robot.Vision.*;
@@ -50,6 +51,7 @@ public class RobotContainer {
   public boolean canMakeSave = false;
 
   private boolean manualMode = true;
+  private boolean flipped = false;
 
   private EventLoop manualLoop = new EventLoop();
   private EventLoop autoLoop = new EventLoop();
@@ -57,9 +59,11 @@ public class RobotContainer {
 
   private ShuffleboardSubsystem shuffle = ShuffleboardSubsystem.getInstance();
 
-  private LightsSubsystem lights;
+  public LightsSubsystem lights;
 
   public double secondsBeforeSave;
+
+  public double saveMillis = System.currentTimeMillis();
 
   Command driveFieldOrientedDirectAngle;
 
@@ -86,8 +90,8 @@ public class RobotContainer {
     leftArm =
         new ArmSubsystem(
             DeviceIDs.leftArmMotor,
-            Arms.Positions.leftMaxPosition,
-            Arms.Positions.leftMinPosition,
+            Arms.Positions.leftMaxSavePosition,
+            Arms.Positions.leftMinSavePosition,
             false);
 
     leftArm.setPID(Arms.LeftPID.P, Arms.LeftPID.I, Arms.LeftPID.D);
@@ -95,8 +99,8 @@ public class RobotContainer {
     rightArm =
         new ArmSubsystem(
             DeviceIDs.rightArmMotor,
-            Arms.Positions.rightMaxPosition,
-            Arms.Positions.rightMinPosition,
+            Arms.Positions.rightMaxSavePosition,
+            Arms.Positions.rightMinSavePosition,
             true);
 
     rightArm.setPID(Arms.RightPID.P, Arms.RightPID.I, Arms.RightPID.D);
@@ -179,9 +183,13 @@ public class RobotContainer {
         new BooleanEvent(
             enabledLoop, () -> buttonBox.getRawButton(Control.Support.enableMotorsSwitch));
 
-    BooleanEvent refreshScheduler =
+    BooleanEvent wave =
         new BooleanEvent(enabledLoop, () -> buttonBox.getRawButton(Control.Support.waveButton));
-    refreshScheduler.rising().ifHigh(() -> new EmptyCommand().schedule());
+    wave.rising().ifHigh(() -> new WaveCommand(leftArm).schedule());
+
+    BooleanEvent dance =
+        new BooleanEvent(enabledLoop, () -> buttonBox.getRawButton(Control.Support.danceButton));
+    dance.rising().ifHigh(() -> new DanceCommand(this));
 
     toggleSafeMode
         .rising()
@@ -219,6 +227,12 @@ public class RobotContainer {
         new BooleanEvent(
             enabledLoop, () -> buttonBox.getRawButton(Control.Support.manualModeSwitch));
 
+    BooleanEvent setFlipped =
+        new BooleanEvent(
+            enabledLoop, () -> buttonBox.getRawButton(Control.Support.invertButtonBoxSwitch));
+    setFlipped.rising().ifHigh(() -> flipped = false);
+    setFlipped.negate().rising().ifHigh(() -> flipped = true);
+
     setRobotMode.rising().ifHigh(() -> setManualMode(false));
     setRobotMode.negate().rising().ifHigh(() -> setManualMode(true));
 
@@ -248,8 +262,7 @@ public class RobotContainer {
     updateShuffle();
     // updateTests();
     // lights.rainbow();
-    // lights.run();
-
+    lights.run();
   }
 
   public void criticalPeriodic() {
@@ -265,8 +278,14 @@ public class RobotContainer {
 
   public void enabledPeriodic() {
     if (manualMode) {
-      leftArm.moveFromRange(-1, 1, buttonBox.getX());
-      rightArm.moveFromRange(-1, 1, buttonBox.getY());
+      lights.solidColor(0, 0, 255);
+      if (flipped) {
+        leftArm.moveFromRange(-1, 1, buttonBox.getX());
+        rightArm.moveFromRange(-1, 1, -buttonBox.getY());
+      } else {
+        leftArm.moveFromRange(-1, 1, -buttonBox.getY());
+        rightArm.moveFromRange(-1, 1, buttonBox.getX());
+      }
       manualLoop.poll();
     } else {
       autoLoop.poll();
@@ -380,6 +399,7 @@ public class RobotContainer {
         .andThen(
             () -> {
               canMakeSave = true;
+              lights.solidColor(255, 0, 0);
               velocityTracker.reset();
               leftArm.moveToDownPosition();
               rightArm.moveToDownPosition();
@@ -389,14 +409,25 @@ public class RobotContainer {
         .schedule();
   }
 
+  public void ready() {
+    canMakeSave = true;
+    lights.solidColor(255, 0, 0);
+  }
+
   public void makeSave() {
-    if (!canMakeSave) return; // ensure it is ready
+    if (!canMakeSave) {
+      // if (System.currentTimeMillis() - saveMillis > 3000) {
+      // reset();
+      // }
+      return; // ensure it is ready
+    }
     if (velocityTracker.hasTarget()) { // if cameras see the puck
       if (velocityTracker.getSecondsToImpact()
               < Constants.Robot.secondsBeforeSave // if puck going to
           && velocityTracker.getSecondsToImpact() > 0) {
         double saveTime = -Timer.getFPGATimestamp();
         canMakeSave = false;
+        lights.solidColor(0, 255, 0);
         System.out.println("Tracker Latency: " + velocityTracker.getLatency());
         double[] hitPoint = velocityTracker.getHitPoint();
         if (hitPoint[1] > Constants.Robot.legActivationMaxHeight) { // if not legs

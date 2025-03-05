@@ -29,14 +29,14 @@ public class NetAlignCommand extends Command {
   }
 
   private double getXtranslation() {
-    if (tagPitch < -4) return -speed;
-    if (tagPitch > -3) return speed;
+    if (tagPitch < 1) return -speed;
+    if (tagPitch > 2) return speed;
     return 0;
   }
 
   private double getYtranslation() {
-    if (tagYaw < -2) return -speed;
-    if (tagYaw > 2) return speed;
+    if (tagYaw < -8) return -speed;
+    if (tagYaw > -7) return speed;
     return 0;
   }
 
