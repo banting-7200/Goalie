@@ -22,7 +22,7 @@ public class DualCameraVelocityTracker extends SubsystemBase {
   private final double c2RightTilt;
 
   private final double frameRate = 120;
-  private final double minFrames = 10; // minimum frames needed to determine average velocities
+  private final double minFrames = 2; // minimum frames needed to determine average velocities
 
   private ArrayList<double[]> positions = new ArrayList<>();
   private ArrayList<double[]> velocities = new ArrayList<>();
@@ -260,5 +260,11 @@ public class DualCameraVelocityTracker extends SubsystemBase {
 
   public boolean hasTarget() {
     return (c1.hasTarget() && c2.hasTarget());
+  }
+
+  public double getLatency() {
+    double latency1 = c1.getLatency();
+    double latency2 = c2.getLatency();
+    return (latency1 > latency2 ? latency1 : latency2);
   }
 }

@@ -5,11 +5,18 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class PhotonVisionCamera extends SubsystemBase {
+  // private PhotonCamera cam;
   private NetworkTable table;
 
   public PhotonVisionCamera(String cameraName) {
     table = NetworkTableInstance.getDefault().getTable("photonvision").getSubTable(cameraName);
+    // cam = new PhotonCamera(cameraName);
   }
+
+  // @Override
+  // public void periodic() {
+  //   cam.getall
+  // }
 
   public double getTargetWidth() {
     return (double) table.getEntry("targetPixelsX").getNumber(-1);
@@ -49,5 +56,9 @@ public class PhotonVisionCamera extends SubsystemBase {
 
   public double getTargetPixelsY() {
     return (double) table.getEntry("targetPixelsY").getNumber(-1);
+  }
+
+  public double getLatency() {
+    return (double) table.getEntry("latencyMillis").getNumber(-1);
   }
 }

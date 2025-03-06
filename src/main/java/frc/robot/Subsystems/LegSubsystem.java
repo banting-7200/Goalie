@@ -62,6 +62,7 @@ public class LegSubsystem extends SubsystemBase {
   }
 
   public void moveToUpPosition() {
+    isUp = true;
     setPosition(upPosition);
   }
 
@@ -70,7 +71,18 @@ public class LegSubsystem extends SubsystemBase {
   }
 
   public void moveToDownPosition() {
+    isUp = false;
     setPosition(downPosition);
+  }
+
+  public void moveFromRange(double rangeMin, double rangeMax, double input) {
+    if (input > rangeMax) input = rangeMax;
+    if (input < rangeMin) input = rangeMin;
+
+    double position =
+        (input - rangeMin) / (rangeMax - rangeMin) * (upPosition - downPosition) + downPosition;
+
+    setPosition(position);
   }
 
   public void setEnabled(boolean enabled) {

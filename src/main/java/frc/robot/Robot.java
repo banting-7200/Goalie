@@ -22,6 +22,7 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
 
   public Robot() {
+    addPeriodic(() -> m_robotContainer.criticalPeriodic(), 0.005, 0.0025);
     instance = this;
   }
 
@@ -50,10 +51,13 @@ public class Robot extends TimedRobot {
     m_robotContainer.PDH.setSwitchableChannel(false);
     m_robotContainer.velocityTracker.reset();
     m_robotContainer.canMakeSave = false;
+    // m_robotContainer.lights.rainbow();
   }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    // m_robotContainer.lights.run();
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
