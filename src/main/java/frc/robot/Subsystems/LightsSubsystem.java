@@ -3,13 +3,12 @@ package frc.robot.Subsystems;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 
-
 public class LightsSubsystem {
   private AddressableLED ledInstance;
   private AddressableLEDBuffer bufferInstance;
   private int rainbowFirstPixelHue = 0;
- // private long currentTime = System.currentTimeMillis(), previousTime = 0;
 
+  // private long currentTime = System.currentTimeMillis(), previousTime = 0;
 
   public LightsSubsystem(int lightPort, int lightCount) {
     ledInstance = new AddressableLED(lightPort);
@@ -19,7 +18,7 @@ public class LightsSubsystem {
   }
 
   public void run() {
-   // currentTime = System.currentTimeMillis();
+    // currentTime = System.currentTimeMillis();
     ledInstance.setData(bufferInstance);
   }
 

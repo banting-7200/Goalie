@@ -574,9 +574,7 @@ public class RobotContainer {
     }
   }
 
-  public void danceTime() {
-
-  }
+  public void danceTime() {}
 
   public void wave() {
     leftArm.moveToAngle(Constants.Arms.Positions.leftMaxPosition);

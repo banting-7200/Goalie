@@ -75,8 +75,8 @@ public final class Constants {
     }
 
     public class Positions {
-      public static final double leftMaxSavePosition = 155; // 217
-      public static final double leftMinSavePosition = 125; // 171
+      public static final double leftMaxSavePosition = 206; // 217
+      public static final double leftMinSavePosition = 150; // 171
 
       public static final double rightMaxSavePosition = 188; // 292
       public static final double rightMinSavePosition = 137; // 232
