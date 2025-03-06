@@ -115,7 +115,8 @@ public class ArmSubsystem extends SubsystemBase {
     if (input < rangeMin) input = rangeMin;
 
     double position =
-        (input - rangeMin) / (rangeMax - rangeMin) * (upWavePosition - upPosition) + upPosition;
+        (input - rangeMin) / (rangeMax - rangeMin) * (upWavePosition - (upPosition - 30))
+            + (upPosition - 30);
 
     moveToAngle(position);
   }

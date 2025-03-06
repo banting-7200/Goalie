@@ -185,7 +185,7 @@ public class RobotContainer {
 
     BooleanEvent wave =
         new BooleanEvent(enabledLoop, () -> buttonBox.getRawButton(Control.Support.waveButton));
-    wave.rising().ifHigh(() -> new WaveCommand(leftArm).schedule());
+    wave.rising().ifHigh(() -> new WaveCommand(leftArm, lights).schedule());
 
     BooleanEvent dance =
         new BooleanEvent(enabledLoop, () -> buttonBox.getRawButton(Control.Support.danceButton));
