@@ -44,6 +44,7 @@ public class Robot extends TimedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
+    CommandScheduler.getInstance().cancelAll();
     m_robotContainer.leftLeg.setEnabled(false);
     m_robotContainer.rightLeg.setEnabled(false);
     m_robotContainer.rightArm.setEnabled(false);

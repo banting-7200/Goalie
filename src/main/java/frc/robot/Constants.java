@@ -141,15 +141,15 @@ public final class Constants {
     public final class Support {
       public static final int port = 1;
       public static final int zeroHeadButton = 1;
-      public static final int danceButton = 2;
-      public static final int waveButton = 3;
+      public static final int danceButton = 3;
+      public static final int waveButton = 2;
       public static final int clearCameraDataButton = 4;
       public static final int toggleHeadButton = 5;
-      public static final int rightLegToggleButton = 6;
-      public static final int leftLegToggleButton = 7;
+      public static final int rightLegToggleButton = 7;
+      public static final int leftLegToggleButton = 6;
       public static final int enableAutoSaveButton = 8;
-      public static final int enableMotorsSwitch = 9;
-      public static final int manualModeSwitch = 10;
+      public static final int enableMotorsSwitch = 10;
+      public static final int manualModeSwitch = 9;
       public static final int invertButtonBoxSwitch = 11;
     }
   }
