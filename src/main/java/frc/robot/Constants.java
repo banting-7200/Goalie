@@ -156,9 +156,9 @@ public final class Constants {
 
   public final class Head {
     public class PID {
-      public static final double P = 0.1;
+      public static final double P = 0.06;
       public static final double I = 0;
-      public static final double D = 0.5;
+      public static final double D = 0.8;
     }
 
     public final class Positions {
