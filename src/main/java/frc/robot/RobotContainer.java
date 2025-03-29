@@ -52,6 +52,7 @@ public class RobotContainer {
 
   private boolean manualMode = true;
   private boolean flipped = false;
+  private boolean useHeadSlider;
 
   private EventLoop manualLoop = new EventLoop();
   private EventLoop autoLoop = new EventLoop();
@@ -173,7 +174,8 @@ public class RobotContainer {
     BooleanEvent toggleHead =
         new BooleanEvent(
             manualLoop, () -> buttonBox.getRawButton(Control.Support.toggleHeadButton));
-    toggleHead.rising().ifHigh(() -> head.toggleHead());
+
+    toggleHead.and(() -> !useHeadSlider).rising().ifHigh(() -> head.toggleHead());
 
     BooleanEvent zeroHead =
         new BooleanEvent(manualLoop, () -> buttonBox.getRawButton(Control.Support.zeroHeadButton));
@@ -290,6 +292,16 @@ public class RobotContainer {
     } else {
       autoLoop.poll();
     }
+
+    if (buttonBox.getRawAxis(2) > 0.9) {
+      useHeadSlider = false;
+    } else {
+      useHeadSlider = true;
+    }
+    if (useHeadSlider) {
+      head.setHeadPosition(1, -1, buttonBox.getRawAxis(2));
+    }
+
     head.run();
     enabledLoop.poll();
   }
