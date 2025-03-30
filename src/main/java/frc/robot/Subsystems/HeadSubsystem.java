@@ -17,7 +17,7 @@ public class HeadSubsystem {
   int timeOutMs = 30;
   int PIDControllerSlot = 0;
   boolean upPosition = false;
-  boolean enabledMovement = false;
+  boolean enabledMovement = true;
   boolean doesCodeHaveMotorPriority = true;
 
   public HeadSubsystem(int headMotorID, int lowerLimitSwitchID, int upperLimitSwitchID) {

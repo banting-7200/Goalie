@@ -9,10 +9,10 @@ import frc.robot.Subsystems.LightsSubsystem;
 
 public class DanceCommand extends Command {
 
-  double danceTime = 10;
   double position = 0;
-  double increase = 0.001;
+  double increase = 0.05;
   double time = 0;
+  double danceTime = 3.5;
 
   ArmSubsystem leftArm;
   ArmSubsystem rightArm;
@@ -39,13 +39,14 @@ public class DanceCommand extends Command {
   public void execute() {
     position += increase;
     time += 0.02;
-    if (Math.abs(position) > 1) {
+    if (Math.abs(position) >= 1) {
       increase *= -1;
     }
     leftArm.moveFromRange(-1, 1, position);
     rightArm.moveFromRange(-1, 1, -position);
-    leftLeg.moveFromRange(-2, 1, -position);
-    rightArm.moveFromRange(-2, 1, position);
+    leftLeg.moveFromRange(-2, 1, position);
+    rightLeg.moveFromRange(-2, 1, position);
+    head.setHeadPosition(-1, 1, position);
   }
 
   @Override
@@ -59,5 +60,6 @@ public class DanceCommand extends Command {
     rightArm.moveToDownPosition();
     rightLeg.moveToUpPosition();
     leftLeg.moveToUpPosition();
+    head.setHeadPosition(-1, 1, -1);
   }
 }

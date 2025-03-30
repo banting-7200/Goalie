@@ -156,12 +156,30 @@ public class RobotContainer {
     BooleanEvent toggleLeftLeg =
         new BooleanEvent(
             manualLoop, () -> buttonBox.getRawButton(Control.Support.leftLegToggleButton));
-    toggleLeftLeg.rising().ifHigh(() -> leftLeg.togglePosition());
+    toggleLeftLeg
+        .rising()
+        .ifHigh(
+            () -> {
+              if (flipped) {
+                leftLeg.togglePosition();
+              } else {
+                rightLeg.togglePosition();
+              }
+            });
 
     BooleanEvent toggleRightLeg =
         new BooleanEvent(
             manualLoop, () -> buttonBox.getRawButton(Control.Support.rightLegToggleButton));
-    toggleRightLeg.rising().ifHigh(() -> rightLeg.togglePosition());
+    toggleRightLeg
+        .rising()
+        .ifHigh(
+            () -> {
+              if (flipped) {
+                rightLeg.togglePosition();
+              } else {
+                leftLeg.togglePosition();
+              }
+            });
 
     BooleanEvent toggleHead =
         new BooleanEvent(
@@ -183,7 +201,7 @@ public class RobotContainer {
 
     BooleanEvent dance =
         new BooleanEvent(enabledLoop, () -> buttonBox.getRawButton(Control.Support.danceButton));
-    dance.rising().ifHigh(() -> new DanceCommand(this));
+    dance.rising().ifHigh(() -> new DanceCommand(this).schedule());
 
     toggleSafeMode
         .rising()
@@ -193,7 +211,6 @@ public class RobotContainer {
               leftLeg.setEnabled(true);
               rightArm.setEnabled(true);
               leftArm.setEnabled(true);
-              head.enableMovement(true);
             });
     toggleSafeMode
         .negate()
@@ -203,14 +220,13 @@ public class RobotContainer {
               leftLeg.setEnabled(false);
               rightArm.setEnabled(false);
               leftArm.setEnabled(false);
-              head.enableMovement(false);
             });
 
-    BooleanEvent clearCameraData =
+    BooleanEvent ready =
         new BooleanEvent(
-            manualLoop, () -> buttonBox.getRawButton(Control.Support.clearCameraDataButton));
+            autoLoop, () -> buttonBox.getRawButton(Control.Support.enableAutoSaveButton));
 
-    clearCameraData.rising().ifHigh(() -> velocityTracker.reset());
+    ready.rising().ifHigh(() -> ready());
 
     BooleanEvent resetBot =
         new BooleanEvent(
@@ -224,9 +240,8 @@ public class RobotContainer {
     BooleanEvent setFlipped =
         new BooleanEvent(
             enabledLoop, () -> buttonBox.getRawButton(Control.Support.invertButtonBoxSwitch));
-    setFlipped.rising().ifHigh(() -> flipped = false);
-    setFlipped.negate().rising().ifHigh(() -> flipped = true);
-
+    setFlipped.ifHigh(() -> flipped = false);
+    setFlipped.negate().ifHigh(() -> flipped = true);
     setRobotMode.rising().ifHigh(() -> setManualMode(false));
     setRobotMode.negate().rising().ifHigh(() -> setManualMode(true));
 
@@ -267,18 +282,17 @@ public class RobotContainer {
     rightLeg.run();
     leftArm.run();
     rightArm.run();
-    head.run();
   }
 
   public void enabledPeriodic() {
     if (manualMode) {
       lights.solidColor(0, 0, 255);
       if (flipped) {
-        leftArm.moveFromRange(-1, 1, buttonBox.getX());
-        rightArm.moveFromRange(-1, 1, -buttonBox.getY());
-      } else {
         leftArm.moveFromRange(-1, 1, -buttonBox.getY());
         rightArm.moveFromRange(-1, 1, buttonBox.getX());
+      } else {
+        leftArm.moveFromRange(-1, 1, buttonBox.getX());
+        rightArm.moveFromRange(-1, 1, -buttonBox.getY());
       }
       manualLoop.poll();
     } else {
@@ -293,7 +307,6 @@ public class RobotContainer {
     if (useHeadSlider) {
       head.setHeadPosition(1, -1, buttonBox.getRawAxis(2));
     }
-
     head.run();
     enabledLoop.poll();
   }
@@ -402,8 +415,6 @@ public class RobotContainer {
     new NetAlignCommand(drivebase, backCamera)
         .andThen(
             () -> {
-              canMakeSave = true;
-              lights.solidColor(255, 0, 0);
               velocityTracker.reset();
               leftArm.moveToDownPosition();
               rightArm.moveToDownPosition();
@@ -420,9 +431,7 @@ public class RobotContainer {
 
   public void makeSave() {
     if (!canMakeSave) {
-      // if (System.currentTimeMillis() - saveMillis > 3000) {
-      // reset();
-      // }
+      lights.solidColor(0, 255, 0);
       return; // ensure it is ready
     }
     if (velocityTracker.hasTarget()) { // if cameras see the puck
@@ -456,6 +465,8 @@ public class RobotContainer {
             }
           } else { // if above net
             System.out.println("Too High");
+            leftArm.moveToUpPosition();
+            rightArm.moveToUpPosition();
           }
         } else { // if legs
           if (hitPoint[0] > Constants.Robot.width / 2) { // if on right
@@ -576,11 +587,5 @@ public class RobotContainer {
         System.out.println("hasTarget");
       }
     }
-  }
-
-  public void danceTime() {}
-
-  public void wave() {
-    leftArm.moveToAngle(Constants.Arms.Positions.leftMaxPosition);
   }
 }

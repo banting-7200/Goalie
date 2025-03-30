@@ -4,11 +4,15 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.SwerveSubsystem;
 import frc.robot.Vision.PhotonVisionCamera;
+import java.time.Clock;
 
 public class NetAlignCommand extends Command {
 
   private SwerveSubsystem swerve;
   private PhotonVisionCamera camera;
+
+  private Clock timer = Clock.systemDefaultZone();
+  private long startTime;
 
   private double tagYaw;
   private double tagPitch;
@@ -19,6 +23,7 @@ public class NetAlignCommand extends Command {
     this.camera = camera;
     this.swerve = swerve;
     addRequirements(swerve, camera);
+    startTime = timer.millis();
   }
 
   @Override
@@ -29,14 +34,14 @@ public class NetAlignCommand extends Command {
   }
 
   private double getXtranslation() {
-    if (tagPitch < 1) return -speed;
-    if (tagPitch > 2) return speed;
+    if (tagPitch < -5) return -speed;
+    if (tagPitch > -6) return speed;
     return 0;
   }
 
   private double getYtranslation() {
-    if (tagYaw < -8) return -speed;
-    if (tagYaw > -7) return speed;
+    if (tagYaw < 1) return -speed;
+    if (tagYaw > -1) return speed;
     return 0;
   }
 
@@ -56,6 +61,10 @@ public class NetAlignCommand extends Command {
     getTagData();
     if (!camera.hasTarget()) {
       System.out.println("No Target");
+      return true;
+    }
+    if (timer.millis() - startTime >= 5000) {
+      System.out.println("Timeout");
       return true;
     }
     return (getXtranslation() == 0 && getYtranslation() == 0 && getRotation() == 0);

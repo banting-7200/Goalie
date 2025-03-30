@@ -44,6 +44,7 @@ public class Robot extends TimedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
+    CommandScheduler.getInstance().cancelAll();
     m_robotContainer.leftLeg.setEnabled(false);
     m_robotContainer.rightLeg.setEnabled(false);
     m_robotContainer.rightArm.setEnabled(false);
@@ -77,6 +78,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    m_robotContainer.head.zeroEncoder();
     m_robotContainer.PDH.setSwitchableChannel(true);
   }
 
