@@ -145,19 +145,11 @@ public class RobotContainer {
 
   private void configureBindings() {
     shuffle.setPID("PID Tuner", Arms.RightPID.P, Arms.RightPID.I, Arms.RightPID.D);
-    // BooleanEvent updatePIDs =
-    //     new BooleanEvent(manualLoop, () ->
-    // driveController.getRawButton(Control.Main.updatePIDsButton));
 
-    // updatePIDs
-    //     .rising()
-    //     .ifHigh(
-    //         () -> {
-    //           double[] PID = shuffle.getPID("PID Tuner");
-    //           // Simply change the below line to tune PIDs for another object.
-    //           rightArm.setPID(PID);
-    //           System.out.println("UPDATING PIDS");
-    //         });
+    BooleanEvent enableCreepDrive =
+        new BooleanEvent(enabledLoop, () -> driveController.getLeftTriggerAxis() > 0.5);
+
+    enableCreepDrive.ifHigh(() -> drivebase.setCreepDrive(true));
 
     // ----------------------ButtonBox-----------------------------------
 
