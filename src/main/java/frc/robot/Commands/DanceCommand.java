@@ -44,8 +44,9 @@ public class DanceCommand extends Command {
     }
     leftArm.moveFromRange(-1, 1, position);
     rightArm.moveFromRange(-1, 1, -position);
-    leftLeg.moveFromRange(-2, 1, -position);
-    rightArm.moveFromRange(-2, 1, position);
+    leftLeg.moveFromRange(-2, 1, position);
+    rightLeg.moveFromRange(-2, 1, position);
+    head.setHeadPosition(-1, 1, position);
   }
 
   @Override
@@ -59,5 +60,6 @@ public class DanceCommand extends Command {
     rightArm.moveToDownPosition();
     rightLeg.moveToUpPosition();
     leftLeg.moveToUpPosition();
+    head.setHeadPosition(-1, 1, -1);
   }
 }

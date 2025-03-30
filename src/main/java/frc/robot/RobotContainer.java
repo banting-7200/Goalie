@@ -219,7 +219,6 @@ public class RobotContainer {
               leftLeg.setEnabled(true);
               rightArm.setEnabled(true);
               leftArm.setEnabled(true);
-              head.enableMovement(true);
             });
     toggleSafeMode
         .negate()
@@ -229,7 +228,6 @@ public class RobotContainer {
               leftLeg.setEnabled(false);
               rightArm.setEnabled(false);
               leftArm.setEnabled(false);
-              head.enableMovement(false);
             });
 
     BooleanEvent ready =
@@ -250,9 +248,8 @@ public class RobotContainer {
     BooleanEvent setFlipped =
         new BooleanEvent(
             enabledLoop, () -> buttonBox.getRawButton(Control.Support.invertButtonBoxSwitch));
-    setFlipped.rising().ifHigh(() -> flipped = false);
-    setFlipped.negate().rising().ifHigh(() -> flipped = true);
-
+    setFlipped.ifHigh(() -> flipped = false);
+    setFlipped.negate().ifHigh(() -> flipped = true);
     setRobotMode.rising().ifHigh(() -> setManualMode(false));
     setRobotMode.negate().rising().ifHigh(() -> setManualMode(true));
 
@@ -318,7 +315,6 @@ public class RobotContainer {
     if (useHeadSlider) {
       head.setHeadPosition(1, -1, buttonBox.getRawAxis(2));
     }
-
     head.run();
     enabledLoop.poll();
   }
@@ -599,11 +595,5 @@ public class RobotContainer {
         System.out.println("hasTarget");
       }
     }
-  }
-
-  public void danceTime() {}
-
-  public void wave() {
-    leftArm.moveToAngle(Constants.Arms.Positions.leftMaxPosition);
   }
 }
