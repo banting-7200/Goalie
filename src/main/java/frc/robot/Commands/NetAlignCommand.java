@@ -17,7 +17,7 @@ public class NetAlignCommand extends Command {
   private double tagYaw;
   private double tagPitch;
 
-  private double speed = 0.01;
+  private double speed = 0.005;
 
   public NetAlignCommand(SwerveSubsystem swerve, PhotonVisionCamera camera) {
     this.camera = camera;
@@ -34,14 +34,14 @@ public class NetAlignCommand extends Command {
   }
 
   private double getXtranslation() {
-    if (tagPitch < -5) return -speed;
-    if (tagPitch > -6) return speed;
+    if (tagPitch > -4.5) return speed;
+    if (tagPitch < -5.5) return -speed;
     return 0;
   }
 
   private double getYtranslation() {
-    if (tagYaw < 1) return -speed;
-    if (tagYaw > -1) return speed;
+    if (tagYaw > 1.5) return speed;
+    if (tagYaw < -1.5) return -speed;
     return 0;
   }
 

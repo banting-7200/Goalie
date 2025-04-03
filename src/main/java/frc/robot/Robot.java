@@ -39,6 +39,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
     m_robotContainer.periodic();
+    m_robotContainer.lights.run();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -52,12 +53,11 @@ public class Robot extends TimedRobot {
     m_robotContainer.PDH.setSwitchableChannel(false);
     m_robotContainer.velocityTracker.reset();
     m_robotContainer.canMakeSave = false;
-    // m_robotContainer.lights.rainbow();
   }
 
   @Override
   public void disabledPeriodic() {
-    // m_robotContainer.lights.run();
+    m_robotContainer.lights.rainbow();
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
@@ -78,7 +78,6 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    m_robotContainer.head.zeroEncoder();
     m_robotContainer.PDH.setSwitchableChannel(true);
   }
 

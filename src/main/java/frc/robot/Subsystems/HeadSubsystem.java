@@ -18,7 +18,7 @@ public class HeadSubsystem {
   int PIDControllerSlot = 0;
   boolean upPosition = false;
   boolean enabledMovement = true;
-  boolean doesCodeHaveMotorPriority = true;
+  boolean isZeroed = false;
 
   public HeadSubsystem(int headMotorID, int lowerLimitSwitchID, int upperLimitSwitchID) {
     headMotor = new TalonFX(headMotorID);
@@ -48,11 +48,7 @@ public class HeadSubsystem {
   }
 
   public boolean withinLimits() {
-    if (lowerLimitSwitch.get() && upperLimitSwitch.get()) {
-      return true;
-    }
-    // System.out.println("Limits hit: " + lowerLimitSwitch.get() + " | " + upperLimitSwitch.get());
-    return false;
+    return (lowerLimitSwitch.get() && upperLimitSwitch.get());
   }
 
   public void toggleHead() {
@@ -78,29 +74,30 @@ public class HeadSubsystem {
     return headMotor.getSelectedSensorPosition();
   }
 
-  public void zeroEncoder() {
-    doesCodeHaveMotorPriority = true;
-    while (withinLimits() && enabledMovement) {
-      headMotor.set(ControlMode.PercentOutput, -0.06);
-    }
-    headMotor.set(ControlMode.PercentOutput, 0);
-    System.out.println("hit zero limit");
-    headMotor.setSelectedSensorPosition(0);
-    setPoint = Head.Positions.minPosition;
-    upPosition = false;
-    headMotor.set(ControlMode.Position, setPoint);
-    doesCodeHaveMotorPriority = false;
+  public void reZero() {
+    isZeroed = false;
   }
 
-  public void testReZeroEncoder() {
-    headMotor.setSelectedSensorPosition(0);
+  public void zeroEncoderPeriodic() {
+    if (isZeroed) return;
+    if (!enabledMovement) return;
+    if (lowerLimitSwitch.get()) {
+      headMotor.set(ControlMode.PercentOutput, -0.06);
+    } else {
+      headMotor.set(ControlMode.PercentOutput, 0);
+      System.out.println("Head Zeroed");
+      headMotor.setSelectedSensorPosition(0);
+      setPoint = Head.Positions.minPosition;
+      upPosition = false;
+      isZeroed = true;
+      headMotor.set(ControlMode.Position, setPoint);
+    }
   }
 
   public void run() {
-    if (withinLimits() && enabledMovement && !doesCodeHaveMotorPriority) {
+    zeroEncoderPeriodic();
+    if (withinLimits() && enabledMovement) {
       headMotor.set(ControlMode.Position, setPoint);
-    } else if (!doesCodeHaveMotorPriority) {
-      // headMotor.set(ControlMode.PercentOutput, 0);
     }
   }
 }

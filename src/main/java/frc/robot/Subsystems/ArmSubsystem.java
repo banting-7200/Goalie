@@ -15,9 +15,9 @@ public class ArmSubsystem extends SubsystemBase {
 
   private double currentPosition;
   private double setPosition;
+
   private double upPosition;
   private double downPosition;
-
   private double upWavePosition = Arms.Positions.leftMaxPosition;
 
   private double upperStopRange = Arms.Positions.upperStopRange;

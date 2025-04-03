@@ -40,13 +40,13 @@ public final class Constants {
     }
 
     public class rightPID {
-      public static final double P = 0.009;
+      public static final double P = 0.012;
       public static final double I = 0.003;
       public static final double D = 0.002;
     }
 
     public class Positions {
-      public static final double leftUpPosition = 119;
+      public static final double leftUpPosition = 115;
       public static final double leftDownPosition = 44.5;
 
       public static final double rightUpPosition = 163.3;
@@ -70,23 +70,23 @@ public final class Constants {
     }
 
     public class LeftPID {
-      public static final double P = 0.035;
-      public static final double I = 0;
-      public static final double D = 0.004;
+      public static final double P = 0.030;
+      public static final double I = 0.00;
+      public static final double D = 0.007;
     }
 
     public class Positions {
-      public static final double leftMaxSavePosition = 206; // 217
-      public static final double leftMinSavePosition = 150; // 171
+      public static final double leftMaxSavePosition = 171; // 206
+      public static final double leftMinSavePosition = 137; // 157
 
-      public static final double rightMaxSavePosition = 188; // 292
-      public static final double rightMinSavePosition = 137; // 232
+      public static final double rightMaxSavePosition = 188; // 188
+      public static final double rightMinSavePosition = 152; // 232
 
       public static final double upperStopRange = 1;
       public static final double lowerStopRange = 5;
 
       public static final double leftMaxPosition = 220;
-      public static final double leftMinPosition = 125;
+      public static final double leftMinPosition = 131;
     }
 
     public final class motorControllerConfigurations {
@@ -162,7 +162,7 @@ public final class Constants {
     }
 
     public final class Positions {
-      public static final double maxPosition = 30000;
+      public static final double maxPosition = 29000;
       public static final double minPosition = 2000;
     }
   }

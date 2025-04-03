@@ -47,6 +47,7 @@ public class DanceCommand extends Command {
     leftLeg.moveFromRange(-2, 1, position);
     rightLeg.moveFromRange(-2, 1, position);
     head.setHeadPosition(-1, 1, position);
+    lights.rainbow();
   }
 
   @Override

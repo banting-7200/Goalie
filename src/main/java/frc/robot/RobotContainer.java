@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Commands.DanceCommand;
 import frc.robot.Commands.DriveHorizontalCommand;
 import frc.robot.Commands.NetAlignCommand;
@@ -70,6 +71,8 @@ public class RobotContainer {
 
   public RobotContainer() {
     shuffle.setTab("Status");
+    shuffle.setPID("PID", Arms.LeftPID.P, Arms.LeftPID.I, Arms.LeftPID.D);
+
     leftLeg =
         new LegSubsystem(
             DeviceIDs.leftLegMotor,
@@ -144,21 +147,6 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    shuffle.setPID("PID Tuner", Arms.RightPID.P, Arms.RightPID.I, Arms.RightPID.D);
-    // BooleanEvent updatePIDs =
-    //     new BooleanEvent(manualLoop, () ->
-    // driveController.getRawButton(Control.Main.updatePIDsButton));
-
-    // updatePIDs
-    //     .rising()
-    //     .ifHigh(
-    //         () -> {
-    //           double[] PID = shuffle.getPID("PID Tuner");
-    //           // Simply change the below line to tune PIDs for another object.
-    //           rightArm.setPID(PID);
-    //           System.out.println("UPDATING PIDS");
-    //         });
-
     // ----------------------ButtonBox-----------------------------------
 
     BooleanEvent toggleLeftLeg =
@@ -197,7 +185,7 @@ public class RobotContainer {
 
     BooleanEvent zeroHead =
         new BooleanEvent(manualLoop, () -> buttonBox.getRawButton(Control.Support.zeroHeadButton));
-    zeroHead.rising().ifHigh(() -> head.zeroEncoder());
+    zeroHead.rising().ifHigh(() -> head.reZero());
 
     BooleanEvent toggleSafeMode =
         new BooleanEvent(
@@ -315,7 +303,7 @@ public class RobotContainer {
     if (useHeadSlider) {
       head.setHeadPosition(1, -1, buttonBox.getRawAxis(2));
     }
-    head.run();
+    //  head.run();
     enabledLoop.poll();
   }
 
@@ -354,14 +342,18 @@ public class RobotContainer {
   public void updateShuffle() {
     shuffle.setTab("Goalia");
 
+    double[] PID = shuffle.getPID("PID");
+    leftArm.setPID(PID[0], PID[1], PID[2]);
     shuffle.setLayout("Left Leg", 1, 3);
     shuffle.setBoolean("Left Leg Up", leftLeg.isUp());
     shuffle.setBoolean("Left Leg Locked", leftLeg.isEnabled());
+    shuffle.setNumber("Left Leg Position", leftLeg.getPosition());
     shuffle.setNumber("Left Leg Current", leftLeg.getCurrent());
 
     shuffle.setLayout("Right Leg", 1, 3);
     shuffle.setBoolean("Right Leg Up", rightLeg.isUp());
     shuffle.setBoolean("Right Leg Locked", rightLeg.isEnabled());
+    shuffle.setNumber("Right Leg Position", rightLeg.getPosition());
     shuffle.setNumber("Right Leg Current", rightLeg.getCurrent());
 
     shuffle.setLayout("Left Arm", 1, 3);
@@ -420,8 +412,7 @@ public class RobotContainer {
   }
 
   public void reset() {
-    new NetAlignCommand(drivebase, backCamera)
-        .andThen(
+    new InstantCommand(
             () -> {
               velocityTracker.reset();
               leftArm.moveToDownPosition();
@@ -429,6 +420,7 @@ public class RobotContainer {
               leftLeg.moveToUpPosition();
               rightLeg.moveToUpPosition();
             })
+        .andThen(new NetAlignCommand(drivebase, backCamera))
         .schedule();
   }
 
