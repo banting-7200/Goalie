@@ -70,9 +70,9 @@ public final class Constants {
     }
 
     public class LeftPID {
-      public static final double P = 0.030;
+      public static final double P = 0.025;
       public static final double I = 0.00;
-      public static final double D = 0.007;
+      public static final double D = 0.06;
     }
 
     public class Positions {

@@ -71,7 +71,7 @@ public class RobotContainer {
 
   public RobotContainer() {
     shuffle.setTab("Status");
-    shuffle.setPID("PID", Arms.LeftPID.P, Arms.LeftPID.I, Arms.LeftPID.D);
+    shuffle.setPID("arm", Arms.LeftPID.P, Arms.LeftPID.I, Arms.LeftPID.D);
 
     leftLeg =
         new LegSubsystem(
@@ -210,6 +210,7 @@ public class RobotContainer {
             });
     toggleSafeMode
         .negate()
+        // .rising()
         .ifHigh(
             () -> {
               rightLeg.setEnabled(false);
@@ -243,17 +244,36 @@ public class RobotContainer {
 
     // ----------------------XboxController--------------------------------
 
-    BooleanEvent switchTestMode =
-        new BooleanEvent(
-            manualLoop, () -> driveController.getRawButton(Control.Main.switchTestModeButton));
+    // BooleanEvent switchTestMode =
+    //     new BooleanEvent(
+    //         manualLoop, () -> driveController.getRawButton(Control.Main.switchTestModeButton));
 
-    switchTestMode.rising().ifHigh(() -> testMode++);
+    // switchTestMode.rising().ifHigh(() -> testMode++);
 
     BooleanEvent zeroGyro =
         new BooleanEvent(
             enabledLoop, () -> driveController.getRawButton(Control.Main.zeroGyroButton));
     zeroGyro.rising().ifHigh(() -> drivebase.zeroGyro());
     drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
+
+    // BooleanEvent updatePID =
+    //     new BooleanEvent(enabledLoop, () -> driveController.getXButtonPressed());
+    // updatePID
+    //     .rising()
+    //     .ifHigh(
+    //         () -> {
+    //           leftArm.setPID(shuffle.getPID("arm"));
+    //         });
+
+    BooleanEvent toggleCreepDrive =
+        new BooleanEvent(enabledLoop, () -> driveController.getYButton());
+
+    toggleCreepDrive
+        .rising()
+        .ifHigh(
+            () -> {
+              drivebase.setCreepDrive(!drivebase.getCreepDrive());
+            });
   }
 
   // --------------------------------------------------------------------------
@@ -281,7 +301,19 @@ public class RobotContainer {
   }
 
   public void enabledPeriodic() {
+
+    // if (driveController.getBButtonPressed()) {
+    //   rightLeg.setEnabled(!rightLeg.isEnabled());
+    //   leftLeg.setEnabled(!leftLeg.isEnabled());
+    //   rightArm.setEnabled(!rightArm.isEnabled());
+    //   leftArm.setEnabled(!leftArm.isEnabled());
+    // }
     if (manualMode) {
+      // leftArm.moveFromRange(0, 1, driveController.getLeftTriggerAxis());
+      // rightArm.moveFromRange(0, 1, driveController.getRightTriggerAxis());
+      // if (driveController.getLeftBumperPressed()) leftLeg.togglePosition();
+      // if (driveController.getRightBumperPressed()) rightLeg.togglePosition();
+      // lights.rainbow();
       lights.solidColor(0, 0, 255);
       if (flipped) {
         leftArm.moveFromRange(-1, 1, -buttonBox.getY());
@@ -303,7 +335,7 @@ public class RobotContainer {
     if (useHeadSlider) {
       head.setHeadPosition(1, -1, buttonBox.getRawAxis(2));
     }
-    //  head.run();
+    // head.run();
     enabledLoop.poll();
   }
 
@@ -342,8 +374,6 @@ public class RobotContainer {
   public void updateShuffle() {
     shuffle.setTab("Goalia");
 
-    double[] PID = shuffle.getPID("PID");
-    leftArm.setPID(PID[0], PID[1], PID[2]);
     shuffle.setLayout("Left Leg", 1, 3);
     shuffle.setBoolean("Left Leg Up", leftLeg.isUp());
     shuffle.setBoolean("Left Leg Locked", leftLeg.isEnabled());

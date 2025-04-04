@@ -165,6 +165,7 @@ public class ShuffleboardSubsystem extends SubsystemBase {
     double p = getNumber(name + " P");
     double i = getNumber(name + " I");
     double d = getNumber(name + " D");
+    System.out.println("" + p + " " + i + " " + d);
     return new double[] {p, i, d};
   }
 

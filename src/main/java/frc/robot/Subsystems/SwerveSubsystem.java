@@ -47,6 +47,9 @@ public class SwerveSubsystem extends SubsystemBase {
   /** Swerve drive object. */
   private final SwerveDrive swerveDrive;
 
+  private double creepDriveMultiplier = 0.25;
+  private boolean creepDrive = true;
+
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
@@ -251,7 +254,7 @@ public class SwerveSubsystem extends SubsystemBase {
                   headingX.getAsDouble(),
                   headingY.getAsDouble(),
                   swerveDrive.getOdometryHeading().getRadians(),
-                  swerveDrive.getMaximumVelocity()));
+                  swerveDrive.getMaximumVelocity() * creepDriveMultiplier));
         });
   }
 
@@ -611,5 +614,14 @@ public class SwerveSubsystem extends SubsystemBase {
   public void addFakeVisionReading() {
     swerveDrive.addVisionMeasurement(
         new Pose2d(3, 3, Rotation2d.fromDegrees(65)), Timer.getFPGATimestamp());
+  }
+
+  public void setCreepDrive(boolean creepDrive) {
+    this.creepDrive = creepDrive;
+    creepDriveMultiplier = creepDrive ? 0.25 : 1;
+  }
+
+  public boolean getCreepDrive() {
+    return creepDrive;
   }
 }
