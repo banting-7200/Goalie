@@ -616,6 +616,12 @@ public class SwerveSubsystem extends SubsystemBase {
         new Pose2d(3, 3, Rotation2d.fromDegrees(65)), Timer.getFPGATimestamp());
   }
 
+  public void setCreepDrive(boolean enableCreepDrive) {
+    if (enableCreepDrive) {
+      swerveDrive.setMaximumSpeed(Units.feetToMeters(3));
+    }
+  }
+
   public void setCreepDrive(boolean creepDrive) {
     this.creepDrive = creepDrive;
     creepDriveMultiplier = creepDrive ? 0.25 : 1;

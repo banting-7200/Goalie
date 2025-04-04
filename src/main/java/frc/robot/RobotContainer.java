@@ -147,6 +147,13 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+    shuffle.setPID("PID Tuner", Arms.RightPID.P, Arms.RightPID.I, Arms.RightPID.D);
+
+    BooleanEvent enableCreepDrive =
+        new BooleanEvent(enabledLoop, () -> driveController.getLeftTriggerAxis() > 0.5);
+
+    enableCreepDrive.ifHigh(() -> drivebase.setCreepDrive(true));
+
     // ----------------------ButtonBox-----------------------------------
 
     BooleanEvent toggleLeftLeg =
